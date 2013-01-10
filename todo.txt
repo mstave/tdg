@@ -1,0 +1,1 @@
+(A) 2012-01-09 Handle case with empty todo.txt file

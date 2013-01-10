@@ -1,0 +1,27 @@
+TDG: Todo GUI
+Author: Matt Stave (mstave@gmail.com)
+
+Goals:
+
+	* Make it easier to manage my to do list
+	
+	* Provide a graphical interface on todo.txt data so that larger lists can more easily
+	  be undertood and manipulated
+
+	* Get better at Python
+
+	* Learn Tk
+
+	* No dependencies but a standard Python install, cross-platform
+
+	* Build an extensible foundation for future expansion
+
+
+Major Files:
+
+	todo_item.py :	An object that abstracts a to-do item, can parse lines in the todo.txt format
+	todo_file.py :	An object that abstracts an entire to-do list
+	tdg.py    	 :	Tkinter-based GUI
+	tdcli.py     :  A basic command-line interface (work in progress)
+
+	*test.py     :  Unit tests
