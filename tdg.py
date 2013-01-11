@@ -1,3 +1,4 @@
+#!python
 '''
 Created on Oct 7, 2012
 
@@ -9,6 +10,7 @@ import tkFont
 import ttk
 import todo_file
 from todo_item import TodoItem 
+
 class TDTk(object):
     '''
    GUI for TodoFile
@@ -18,23 +20,41 @@ class TDTk(object):
         '''
         Constructor
         '''
-        self.td_file = todo_file.TodoFile()
         self.root = tk.Tk()
         self.status_strvar = ttk.Tkinter.StringVar()
         self.status_bar = None
-        self.bottom = None
+        self.help_bar = None
         self.tabs = None
+
+        # window for inserting new tasks
+        self.add_win = None
+
+        # todo file contents
+        self.td_file = None
+
         # used for creating new tasks
         self.new_task = tk.StringVar()
         self.new_context = tk.StringVar()
         self.new_priority = tk.StringVar()
         self.new_date = tk.StringVar()
+        
+        #for restoring active tab after a reload
         self.active_tab_idx = 0
 
         self.pri_map = { "A" : "Do TODAY (A)", "B" : "Next (B)", "C" : "Soon (C)", "D" : "Someday (D)", None : "NEEDS PRIORITY" }
+        self.load()
 
     
+    def load(self):
+        self.td_file = todo_file.TodoFile()
+
+    def reload(self, event):
+        self.load()
+        self.reset_ui()
+
+
     def save(self):
+        self.set_status("Adding new item: ")
         new_item = TodoItem()
         new_item.priority = self.new_priority.get()
         if new_item.priority == "":
@@ -46,9 +66,9 @@ class TDTk(object):
         new_item.creation_date = self.new_date.get()
         if new_item.creation_date == "" :
             new_item.creation_date = None 
-        self.set_status("Committing new item: " + str(new_item))
+        self.set_status("Adding new item: " + str(new_item))
         self.td_file.append(new_item)
-        self.set_status("Committing new item: " + str(new_item) + " ... save complete")
+        self.set_status("Adding new item: " + str(new_item) + " ... save complete")
         self.reset_ui()
      
     def add_attr(self, win, display_str, store_var, g_row ):
@@ -58,20 +78,27 @@ class TDTk(object):
         return ent   
     
     def add_task(self, event):
-        insert_win = tk.Toplevel(takefocus=True)
-        insert_win.title = "Add a new to do"
-        self.add_attr(insert_win, "Task: ", self.new_task, 1).focus()
-        self.add_attr(insert_win, "Pri: ", self.new_priority, 2)
-        self.add_attr(insert_win, "Context: ", self.new_context, 3)
-        self.add_attr(insert_win, "Creation Date: ", self.new_date, 4)
-        tk.Button(insert_win,text="Close", command=lambda: insert_win.destroy()).grid(row=5, column=2)
-        tk.Button(insert_win,text="Commit", command=lambda: self.save()).grid(row=5, column=3)
+        self.add_win = tk.Toplevel(takefocus=True)
+        self.add_win.title = "Add a new to do"
+        self.add_attr(self.add_win, "Task: ", self.new_task, 1).focus()
+        self.add_attr(self.add_win, "Pri: ", self.new_priority, 2)
+        self.add_attr(self.add_win, "Context: ", self.new_context, 3)
+        self.add_attr(self.add_win, "Creation Date: ", self.new_date, 4)
+        button_frame = tk.Frame(self.add_win)
+        button_frame.grid(row=5, columnspan=2, column=2)
+        tk.Button(button_frame,text="Close", command= lambda: self.add_win.destroy()).pack(side=tk.LEFT)
+        tk.Button(button_frame,text="Add this task", command=lambda : self.save()).pack(side=tk.LEFT)
+        tk.Button(button_frame,text="Add and close", command=lambda : self.commit_close()).pack(side=tk.LEFT)
         self.new_date.set(TodoItem.curr_date_str())
-        #self.new_context.set("") 
-        #self.new_priority.set("G")
-        #self.new_task.set("")
-        insert_win.focus_set()       
+        self.add_win.focus_set()       
+        self.add_win.bind("<Return>", lambda event: self.commit_close())
+        self.add_win.bind("<Escape>", lambda event: self.add_win.destroy())
         
+    def commit_close(self):
+        print "commit_close"
+        self.save()
+        self.add_win.destroy()
+
     # methods for determining which items to display
     def includeAll(self, arg):
         return True
@@ -152,7 +179,9 @@ class TDTk(object):
         self.status_strvar.set(status_str)
         
     def list_selected(self, event):
-        self.set_status(self.td_file.todo_item_arr[self.td_file.todo_txt_arr.index(event.widget.get(event.widget.curselection()[0]))])
+        # ignore clicks on empty listboxes
+        if event.widget.curselection() != () :
+            self.set_status(self.td_file.todo_item_arr[self.td_file.todo_txt_arr.index(event.widget.get(event.widget.curselection()[0]))])
  
     def set_priority(self, event):
         pri = event.char
@@ -224,26 +253,32 @@ class TDTk(object):
         lbox.bind("n", self.set_priority)
         lbox.bind("x", self.toggle_complete)
         lbox.bind("i", self.add_task)
-        lbox.bind("s", self.add_task)
-        lbox.bind("w", self.write_file)
         lbox.bind("m", self.modify_task)
-        lbox.bind("q", exit)
+        self.global_binds(lbox)
+
+    def global_binds(self, widget):
+        widget.bind("w", self.write_file)
+        widget.bind("s", self.write_file)
+        widget.bind("i", self.add_task)
+        widget.bind("r", self.reload)
+        widget.bind("q", lambda event: self.root.destroy())
         
     def command_help(self):
         return "[a-e (or n for none)]: set priority\
             \t x: toggle complete\
             \t i: insert new task\
-            \t s:save\
+            \t s or w:save\
             \t <Delete>: delete task\
             \t m: modify task\
-            \tq: quit"
+            \t r: reload file\
+            \t q: quit"
 
     def add_tab(self,root,func,label_text):
         new_frame = ttk.Frame(root)
         self.list_ui(new_frame, func)
         new_frame.pack(fill=tk.BOTH, expand=1)
         root.add(new_frame, text = label_text)
- 
+
     def add_all_tabs(self):
         self.tabs = ttk.Notebook(self.frame)
         self.add_tab(self.tabs, lambda arg: ((not arg.done) and ( arg.context != "home")), "Open: Work")
@@ -255,15 +290,14 @@ class TDTk(object):
         self.add_tab(self.tabs, lambda arg: not arg.done, "Open: All Contexts")
         self.add_tab(self.tabs, lambda arg : arg.done, "Complete: All Contexts")
         self.tabs.pack(fill=tk.BOTH, expand=1)
-        self.tabs.bind("w", self.write_file)
-        self.tabs.bind("i", self.add_task)
-        self.tabs.bind("q", exit)
+        self.global_binds(self.tabs)
         
     def run(self):
         '''
         kick off everything
         '''
         self.frame = tk.Frame(self.root)
+        self.global_binds(self.frame)
         self.frame.pack(fill=tk.BOTH, expand=1)
         self.add_all_tabs()
         self.help_bar = tk.Label(self.frame,text=self.command_help())
@@ -272,8 +306,9 @@ class TDTk(object):
             self.status_bar = tk.Label(self.frame,anchor=tk.W, justify="left", textvar=self.status_strvar)
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
         self.frame.master.title("To do GUI")
+        self.restore_active_tab()
         self.root.mainloop()
 
 if __name__ == "__main__":
-    APP = TDTk()
-    APP.run()
+    app = TDTk()
+    app.run()

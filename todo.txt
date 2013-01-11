@@ -1,6 +1,7 @@
 (C) 2012-01-09 Handle case with empty todo.txt file
-(B) 2013-01-09 handle insert from frame focus
-(C) 2013-01-09 Change default tab to be open all
-(B) 2013-01-09 take path to todo.txt as a command-line arg
-(A) 2013-01-09 Handle clicking on empty listbox
-(D) 2013-01-09 Make executable in bash
+x 2013-01-10 2013-01-09 handle insert from frame focus
+(B) 2013-01-09 Change default tab to be open all
+(A) 2013-01-09 take path to todo.txt as a command-line arg
+x 2013-01-10 2013-01-09 Handle clicking on empty listbox
+x 2013-01-10 2013-01-09 Make executable in bash
+(D) 2013-01-10 add search
