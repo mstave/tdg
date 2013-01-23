@@ -95,7 +95,6 @@ class TDTk(object):
         self.add_win.bind("<Escape>", lambda event: self.add_win.destroy())
         
     def commit_close(self):
-        print "commit_close"
         self.save()
         self.add_win.destroy()
 

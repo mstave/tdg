@@ -5,3 +5,4 @@ x 2013-01-10 2013-01-09 handle insert from frame focus
 x 2013-01-10 2013-01-09 Handle clicking on empty listbox
 x 2013-01-10 2013-01-09 Make executable in bash
 (D) 2013-01-10 add search
+(D) 2013-01-22 add button to show stats
