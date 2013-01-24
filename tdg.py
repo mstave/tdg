@@ -43,7 +43,7 @@ class TDTk(object):
         self.active_tab_idx = 0
 
         self.pri_map = {"A": "Do TODAY (A)", "B": "Next (B)", "C": "Soon (C)",
-                        "D": "Someday (D)", None: "NEEDS PriORITY"}
+                        "D": "Someday (D)", None: "NEEDS PRIORITY"}
         self.load()
 
     def load(self):
