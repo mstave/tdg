@@ -123,7 +123,7 @@ class TDTk(object):
         lbox_panes = tk.PanedWindow(root_frame, orient=tk.VERTICAL, height=800)
         lbox_panes.pack(fill=tk.BOTH, expand=1)
 
-        high_pri_pane = tk.PanedWindow(lbox_panes)
+        high_pri_pane = tk.PanedWindow(lbox_panes, orient=tk.HORIZONTAL, sashwidth=10)
         high_pri_pane.pack(fill=tk.BOTH, expand=1)
         lbox_panes.add(high_pri_pane)
         low_pri_pane = tk.PanedWindow(lbox_panes, orient=tk.HORIZONTAL)
@@ -135,27 +135,26 @@ class TDTk(object):
         aLabelFont = tkFont.Font(weight='bold')
         pri_lists["A"] = tk.LabelFrame(
             high_pri_pane, text=self.pri_map["A"], font=aLabelFont)
-        pri_lists["A"].pack(fill=tk.BOTH, expand=1, anchor="n")
+        pri_lists["A"].pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.add_listbox(
             pri_lists["A"], "A", tkFont.Font(size=11), include_func)
-        high_pri_pane.add(pri_lists["A"])
+        high_pri_pane.add(pri_lists["A"], stretch="always")
 
         # Pri <None> listbox
-        pri_lists[None] = tk.LabelFrame(
-            high_pri_pane, text=self.pri_map[None], font=aLabelFont)
-        pri_lists[None].pack(fill=tk.BOTH, expand=1, anchor="e")
+        pri_lists["B"] = tk.LabelFrame(
+            high_pri_pane, text=self.pri_map["B"], font=aLabelFont)
+        pri_lists["B"].pack(fill=tk.BOTH, expand=1)
         self.add_listbox(
-            pri_lists[None], None, tkFont.Font(size=9), include_func)
-        high_pri_pane.add(pri_lists[None])
-
-        for pri in ["B", "C", "D"]:
+            pri_lists["B"], "B", tkFont.Font(size=9), include_func)
+        high_pri_pane.add(pri_lists["B"], stretch="always")
+        for pri in ["C", "D", None]:
         # for pri in self.td_file.get_priorities():
             pri_lists[pri] = tk.LabelFrame(low_pri_pane,
                                            text=self.pri_map[pri])
             pri_lists[pri].pack(fill=tk.BOTH, expand=1)
             self.add_listbox(
                 pri_lists[pri], pri, tkFont.Font(size=9), include_func)
-            low_pri_pane.add(pri_lists[pri])
+            low_pri_pane.add(pri_lists[pri], stretch="always")
 
     def add_listbox(self, parent, priority, thefont, include_func):
         vscroll = tk.Scrollbar(parent, orient=tk.VERTICAL)
@@ -172,8 +171,9 @@ class TDTk(object):
         hscroll.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.populate_listbox(lbox, priority, include_func)
-        lbox.pack(fill=tk.BOTH, expand=1)
+        lbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.bind_list_commands(lbox)
+
         return lbox
 
     def populate_listbox(self, lbox, priority, include_func):
@@ -183,6 +183,7 @@ class TDTk(object):
                 if include_func(row_itr):
                     lbox.insert(trow, row_itr)
                     trow += 1
+        lbox.master["text"] = "[" + str(trow) + "] " + lbox.master["text"]
 
     def set_status(self, status_str):
         self.status_strvar.set(status_str)
@@ -214,7 +215,7 @@ class TDTk(object):
         self.set_status("adding new task")
         self.add_task(None)
 
-    def toggle_complete(self, event): 
+    def toggle_complete(self, event):
         cur_done = self.get_selected_td(event).done
         self.td_file.todo_item_arr[self.get_td_array_index(
             self.get_selected_text(event))].done = not cur_done
