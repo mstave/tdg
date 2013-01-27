@@ -157,6 +157,9 @@ class TodoItem(object):  # pylint: disable-msg=R0902
         if self.task is not None:
             self.task = self.task.strip()
 
+    def create_today(self):
+        self.creation_date = self.curr_date_str()
+
     @classmethod
     def curr_date_str(cls):
         '''

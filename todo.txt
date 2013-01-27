@@ -6,3 +6,4 @@ x 2013-01-10 2013-01-09 Handle clicking on empty listbox
 x 2013-01-10 2013-01-09 Make executable in bash
 (D) 2013-01-10 add search
 (D) 2013-01-22 add button to show stats
+(C) 2013-01-26 fix #!python to work on BASH + windows

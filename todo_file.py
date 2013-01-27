@@ -61,10 +61,16 @@ class TodoFile(object):
         pris.sort()
         return pris
 
+    def get_task(self, index):
+        return self.todo_item_arr[index]
+
+    def update_task(self, index, td):
+        self.todo_item_arr[index] = td
+
     def update_todo_item_arr(self):
         self.todo_item_arr = []
         for txt_item in self.todo_txt_arr:
-            if txt_item is not None and (len(txt_item.strip()) > 0 ):
+            if txt_item is not None and (len(txt_item.strip()) > 0):
                 self.todo_item_arr.append(TodoItem(txt_item))
 
     def update_todo_txt_arr(self):
@@ -99,13 +105,18 @@ class TodoFile(object):
         self.update_todo_txt_arr()
         return item
 
-    def list_todos(self, arg):
+    def list_todos(self, arg, show_count=False):
         if arg is None:
             return str(self)
         temp_arr = []
+        count = 0
         for todo in self.todo_txt_arr:
             if todo.find(arg) >= 0:
-                temp_arr.append(todo)
+                if show_count:
+                    temp_arr.append(str(count) + " " + todo)
+                else:
+                    temp_arr.append(todo)
+            count += 1
         return '\n'.join(temp_arr) + "\n"
 
     def ls_grep(self, rex):
