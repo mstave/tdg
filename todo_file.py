@@ -19,10 +19,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import re
 import shutil
 import time
 from todo_item import TodoItem
+from os.path import expanduser, exists
 
 
 class TodoFile(object):
@@ -33,11 +35,7 @@ class TodoFile(object):
     ENV_TD_DIR = 'TODO_DIR'  # pylint: disable-msg=W0511
 
     def __init__(self, f_name="todo.txt"):
-        try:
-            tddir = os.environ[self.ENV_TD_DIR]
-        except KeyError:
-            tddir = os.getcwd()
-        self.todo_file_name = os.path.join(tddir, f_name)
+        self.set_filename(f_name)
         self.load_file(self.todo_file_name)
 
     def __eq__(self, other):
@@ -45,6 +43,20 @@ class TodoFile(object):
 
     def __str__(self):
         return '\n'.join(self.todo_txt_arr) + "\n"
+
+    def set_filename(self, f_name="todo.txt"):
+        try:
+            tddir = os.environ[self.ENV_TD_DIR]
+        except KeyError:
+            tddir = os.path.expanduser("~")
+        self.todo_file_name = os.path.join(tddir, f_name)
+        if not os.path.exists(self.todo_file_name):
+            self.todo_file_name = os.path.join(os.getcwd(), f_name)
+        if not os.path.exists(self.todo_file_name):
+            sys.exit("Error: " + f_name + " not found in $" + self.ENV_TD_DIR + ", "
+                + os.path.expanduser("~") + " or "
+                + os.getcwd())
+
 
     def get_gui_index(self, query):
         index = 0
