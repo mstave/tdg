@@ -1,7 +1,7 @@
 '''
 Created on Dec 17, 2012
 
-@author: lb
+@author: mstave
 '''
 import os
 import unittest
