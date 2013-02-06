@@ -1,9 +1,10 @@
 (C) 2012-01-09 Handle case with empty todo.txt file
 x 2013-01-10 2013-01-09 handle insert from frame focus
-(B) 2013-01-09 Change default tab to be open all
+(D) 2013-01-09 Change default tab to be open all
 (A) 2013-01-09 take path to todo.txt as a command-line arg
 x 2013-01-10 2013-01-09 Handle clicking on empty listbox
 x 2013-01-10 2013-01-09 Make executable in bash
 (D) 2013-01-10 add search
 (D) 2013-01-22 add button to show stats
 (C) 2013-01-26 fix #!python to work on BASH + windows
+(C) 2013-02-05 add support for todo.txt in git repository
