@@ -7,4 +7,8 @@ x 2013-01-10 2013-01-09 Make executable in bash
 (D) 2013-01-10 add search
 (D) 2013-01-22 add button to show stats
 (C) 2013-01-26 fix #!python to work on BASH + windows
+<<<<<<< HEAD
 (C) 2013-02-05 add support for todo.txt in git repository
+=======
+(D) 2013-02-18 add sort
+>>>>>>> minor update
