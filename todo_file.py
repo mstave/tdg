@@ -22,9 +22,8 @@ import os
 import sys
 import re
 import shutil
-import time
+import subprocess
 from todo_item import TodoItem
-from os.path import expanduser, exists
 
 
 class TodoFile(object):
@@ -33,6 +32,7 @@ class TodoFile(object):
     todo_item_arr = []
     todo_file_name = None
     ENV_TD_DIR = 'TODO_DIR'  # pylint: disable-msg=W0511
+    last_msg = None
 
     def __init__(self, f_name="todo.txt"):
         self.set_filename(f_name)
@@ -56,7 +56,6 @@ class TodoFile(object):
             sys.exit("Error: " + f_name + " not found in $" + self.ENV_TD_DIR + ", "
                 + os.path.expanduser("~") + " or "
                 + os.getcwd())
-
 
     def get_gui_index(self, query):
         index = 0
@@ -96,10 +95,17 @@ class TodoFile(object):
         self.update_todo_txt_arr()
 
     def load_file(self, f_name=None):
+        try:
+            precmd = os.environ["TD_PRELOAD"]
+            self.last_msg = subprocess.check_output(precmd)
+            print self.last_msg
+        except KeyError:
+            pass
         if f_name is not None:
             self.todo_file_name = f_name
         t_file = open(self.todo_file_name, "r")
-        getlines = open(self.todo_file_name).readlines()
+        getlines = t_file.readlines()
+        #getlines = open(self.todo_file_name).readlines()
         self.todo_txt_arr = [line.strip() for line in getlines]
         self.update_todo_item_arr()
 
@@ -110,6 +116,12 @@ class TodoFile(object):
         t_file.write('\n'.join(self.todo_txt_arr))
         t_file.write('\n')
         t_file.close()
+        try:
+            postcmd = os.environ["TD_POSTSAVE"]
+            self.last_msg = subprocess.check_output(postcmd)
+            print self.last_msg
+        except KeyError:
+            pass
 
     def delete_task(self, index):
         self.todo_txt_arr.pop(index)
