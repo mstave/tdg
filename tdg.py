@@ -305,6 +305,8 @@ class TDTk(object):
             arg.done and (arg.context == "home")), "Complete: Home")
         self.add_tab(
             self.tabs, lambda arg: arg.context == "home", "All: Home")
+        self.add_tab(
+            self.tabs, lambda arg: (not arg.done) and (arg.context == "Ops"), "Open: Ops")
         self.add_tab(self.tabs, lambda arg: not arg.done, "Open: All Contexts")
         self.add_tab(self.tabs, lambda arg: arg.done, "Complete: All Contexts")
         self.tabs.pack(fill=tk.BOTH, expand=1)
