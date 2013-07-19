@@ -321,7 +321,15 @@ class TDTk(object):
         self.add_tab(self.tabs, lambda arg: (
             arg.done ), "Complete: Dropbox", self.td_file2)
         self.add_tab(
+<<<<<<< HEAD
             self.tabs, lambda arg: True, "All: Home", self.td_file2)
+=======
+            self.tabs, lambda arg: arg.context == "home", "All: Home")
+        self.add_tab(
+            self.tabs, lambda arg: (not arg.done) and (arg.context == "Ops"), "Open: Ops")
+        self.add_tab(self.tabs, lambda arg: not arg.done, "Open: All Contexts")
+        self.add_tab(self.tabs, lambda arg: arg.done, "Complete: All Contexts")
+>>>>>>> 805dfae509c574934b02e48a3b0f4fa21563a8f1
         self.tabs.pack(fill=tk.BOTH, expand=1)
         self.global_binds(self.tabs)
 
