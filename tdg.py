@@ -27,11 +27,16 @@ class TDTk(object):
         self.help_bar = None
         self.tabs = None
 
+	#mapping of which tab (frame) maps to which todo_file
+	self.tab_file = {}
+
         # window for inserting new tasks
         self.add_win = None
 
         # todo file contents
         self.td_file = None
+	self.td_file1 = None
+	self.td_file2 = None
 
         # used for creating new tasks
         self.new_task = tk.StringVar()
@@ -47,11 +52,16 @@ class TDTk(object):
         self.load()
 
     def load(self):
-        self.td_file = todo_file.TodoFile()
+        self.td_file = None
+	self.td_file1 = todo_file.TodoFile()
+	self.td_file2 = todo_file.TodoFile("c:\\dropbox\\todo\\todo.txt")
 
     def reload(self, event):
         self.load()
         self.reset_ui()
+
+    def active_td_file(self):
+	return self.tab_file[str(self.tabs.select())]
 
     def save(self):
         self.set_status("Adding new item: ")
@@ -67,7 +77,7 @@ class TDTk(object):
         if new_item.creation_date == "":
             new_item.creation_date = None
         self.set_status("Adding new item: " + str(new_item))
-        self.td_file.append(new_item)
+        self.active_td_file().append(new_item)
         self.set_status(
             "Adding new item: " + str(new_item) + " ... save complete")
         self.reset_ui()
@@ -109,7 +119,7 @@ class TDTk(object):
     def excludeDone(self, arg):
         return not arg.done
 
-    def list_ui(self, root_frame=None, include_func=None):
+    def list_ui(self, td_file, root_frame=None, include_func=None):
         '''
         add lists for each priority to root_frame
         include_func is called on each item to determine if it should be shown
@@ -137,7 +147,7 @@ class TDTk(object):
             high_pri_pane, text=self.pri_map["A"], font=aLabelFont)
         pri_lists["A"].pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.add_listbox(
-            pri_lists["A"], "A", tkFont.Font(size=11), include_func)
+            pri_lists["A"], "A", tkFont.Font(size=11), include_func, td_file)
         high_pri_pane.add(pri_lists["A"], stretch="always")
 
         # Pri <None> listbox
@@ -145,18 +155,18 @@ class TDTk(object):
             high_pri_pane, text=self.pri_map["B"], font=aLabelFont)
         pri_lists["B"].pack(fill=tk.BOTH, expand=1)
         self.add_listbox(
-            pri_lists["B"], "B", tkFont.Font(size=9), include_func)
+            pri_lists["B"], "B", tkFont.Font(size=9), include_func, td_file)
         high_pri_pane.add(pri_lists["B"], stretch="always")
         for pri in ["C", "D", None]:
-        # for pri in self.td_file.get_priorities():
+        # for pri in self.active_td_file().get_priorities():
             pri_lists[pri] = tk.LabelFrame(low_pri_pane,
                                            text=self.pri_map[pri])
             pri_lists[pri].pack(fill=tk.BOTH, expand=1)
             self.add_listbox(
-                pri_lists[pri], pri, tkFont.Font(size=9), include_func)
+                pri_lists[pri], pri, tkFont.Font(size=9), include_func, td_file)
             low_pri_pane.add(pri_lists[pri], stretch="always")
 
-    def add_listbox(self, parent, priority, thefont, include_func):
+    def add_listbox(self, parent, priority, thefont, include_func, td_file):
         vscroll = tk.Scrollbar(parent, orient=tk.VERTICAL)
         hscroll = tk.Scrollbar(parent, orient=tk.HORIZONTAL)
         lbox = tk.Listbox(parent,
@@ -170,15 +180,15 @@ class TDTk(object):
         hscroll.config(command=lbox.xview)
         hscroll.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.populate_listbox(lbox, priority, include_func)
+        self.populate_listbox(lbox, priority, include_func, td_file)
         lbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.bind_list_commands(lbox)
 
         return lbox
 
-    def populate_listbox(self, lbox, priority, include_func):
+    def populate_listbox(self, lbox, priority, include_func, td_file):
         trow = 0
-        for row_itr in self.td_file.todo_item_arr:
+        for row_itr in td_file.todo_item_arr:
             if row_itr.priority == priority:
                 if include_func(row_itr):
                     lbox.insert(trow, row_itr)
@@ -191,15 +201,15 @@ class TDTk(object):
     def list_selected(self, event):
         # ignore clicks on empty listboxes
         if event.widget.curselection() != ():
-            self.set_status(self.td_file.todo_item_arr[self.td_file.todo_txt_arr.index(event.widget.get(event.widget.curselection()[0]))])
+            self.set_status(self.active_td_file().todo_item_arr[self.active_td_file().todo_txt_arr.index(event.widget.get(event.widget.curselection()[0]))])
 
     def set_priority(self, event):
         pri = event.char
         if pri == "n":
             pri = None
-        self.td_file.todo_item_arr[self.get_td_array_index(
+        self.active_td_file().todo_item_arr[self.get_td_array_index(
             self.get_selected_text(event))].priority = pri
-        self.td_file.update_todo_txt_arr()
+        self.active_td_file().update_todo_txt_arr()
         self.reset_ui()
 
     def modify_task(self, event):
@@ -217,13 +227,13 @@ class TDTk(object):
 
     def toggle_complete(self, event):
         cur_done = self.get_selected_td(event).done
-        self.td_file.todo_item_arr[self.get_td_array_index(
+        self.active_td_file().todo_item_arr[self.get_td_array_index(
             self.get_selected_text(event))].done = not cur_done
-        self.td_file.update_todo_txt_arr()
+        self.active_td_file().update_todo_txt_arr()
         self.reset_ui()
 
     def delete_task(self, event):
-        self.td_file.delete_task(
+        self.active_td_file.delete_task(
             self.get_td_array_index(self.get_selected_text(event)))
         self.reset_ui()
 
@@ -231,10 +241,10 @@ class TDTk(object):
         return event.widget.get(event.widget.curselection()[0])
 
     def get_selected_td(self, event):
-        return self.td_file.todo_item_arr[self.get_td_array_index(self.get_selected_text(event))]
+        return self.active_td_file().todo_item_arr[self.get_td_array_index(self.get_selected_text(event))]
 
     def get_td_array_index(self, idx_str):
-        return self.td_file.todo_txt_arr.index(idx_str)
+        return self.active_td_file().todo_txt_arr.index(idx_str)
 
     def save_active_tab(self):
         self.active_tab_idx = self.tabs.index(self.tabs.select())
@@ -250,9 +260,12 @@ class TDTk(object):
         self.restore_active_tab()
 
     def write_file(self, event):
-        self.set_status("writing to: " + self.td_file.todo_file_name)
-        self.td_file.write_file()
-        self.set_status(self.td_file.todo_file_name + " has been saved")
+        self.td_file1.write_file()
+	self.td_file2.write_file()
+        self.set_status(self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
+
+    def debug2(self, event):	
+	self.set_status("Tab info: " + str(self.tabs.select()) + " " + str(self.tabs.index(self.tabs.select())))
 
     def bind_list_commands(self, lbox):
         lbox.bind("<<ListboxSelect>>", self.list_selected)
@@ -269,6 +282,7 @@ class TDTk(object):
         self.global_binds(lbox)
 
     def global_binds(self, widget):
+	widget.bind("X", self.debug2)
         widget.bind("w", self.write_file)
         widget.bind("s", self.write_file)
         widget.bind("i", self.add_task)
@@ -285,28 +299,29 @@ class TDTk(object):
             \t r: reload file\
             \t q: quit"
 
-    def add_tab(self, root, func, label_text):
+    def add_tab(self, root, func, label_text, td_file):
         new_frame = ttk.Frame(root)
-        self.list_ui(new_frame, func)
+	self.tab_file[str(new_frame)] = td_file
+        self.list_ui(td_file,new_frame, func)
         new_frame.pack(fill=tk.BOTH, expand=1)
         root.add(new_frame, text=label_text)
+	return new_frame
 
     def add_all_tabs(self):
         self.tabs = ttk.Notebook(self.frame)
         self.add_tab(self.tabs, lambda arg: (
-            (not arg.done) and (arg.context != "home")), "Open: Work")
+            not arg.done), "Open: Work", self.td_file1)
         self.add_tab(self.tabs, lambda arg: (
-            arg.done and (arg.context != "home")), "Complete: Work")
+            arg.done ), "Complete: Work", self.td_file1)
         self.add_tab(
-            self.tabs, lambda arg: arg.context != "home", "All: Work")
+            #self.tabs, lambda arg: arg.context != "home", "All: Work")
+            self.tabs, lambda arg: True, "All: Work", self.td_file1)
         self.add_tab(self.tabs, lambda arg: (
-            (not arg.done) and (arg.context == "home")), "Open: Home")
+            not arg.done), "Open: Dropbox", self.td_file2)
         self.add_tab(self.tabs, lambda arg: (
-            arg.done and (arg.context == "home")), "Complete: Home")
+            arg.done ), "Complete: Dropbox", self.td_file2)
         self.add_tab(
-            self.tabs, lambda arg: arg.context == "home", "All: Home")
-        self.add_tab(self.tabs, lambda arg: not arg.done, "Open: All Contexts")
-        self.add_tab(self.tabs, lambda arg: arg.done, "Complete: All Contexts")
+            self.tabs, lambda arg: True, "All: Home", self.td_file2)
         self.tabs.pack(fill=tk.BOTH, expand=1)
         self.global_binds(self.tabs)
 
