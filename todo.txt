@@ -1,11 +1,32 @@
 (A) 2013-01-09 take path to todo.txt as a command-line arg
+(B) 2013-01-08 +tdg Fix tuple out of range when you click on empty listbox and hit i
+(B) 2013-01-08 add i)nsert to global bind list +tdg
+(C) +tdi add ? for help
+(C) +tdi add visible dirty flag
+(C) +tdi Fix crash when tdi is too narrow
 (C) 2012-01-09 Handle case with empty todo.txt file
+(C) 2013-01-08 +tdg Fix tuple out of range when you click on empty listbox and hit i
+(C) 2013-01-08 Change title of add new task window +tdg
+(C) 2013-01-08 Have <esc> close add new task window +tdg
+(C) 2013-01-10 +tdi add l)oad
+(C) 2013-01-10 +tdi add R)eload
+(C) 2013-01-10 +tdi add search
+(C) 2013-01-10 +tdi PageUp/Down/Home/End
 (C) 2013-01-26 fix #!python to work on BASH + windows
 (C) 2013-02-05 add support for todo.txt in git repository
+(C) 2013-06-25 Color code by project +tdg
+(C) 2013-06-25 QT version - tdqt +tdg
+(D) +tdi add category support
+(D) +tdi right justify date
 (D) 2013-01-09 Change default tab to be open all
+(D) 2013-01-10 +tdi make 2 columns
+(D) 2013-01-10 +tdi port to todo.sh addon
+(D) 2013-01-10 +tdi sync home tasks with google tasks
 (D) 2013-01-10 add search
 (D) 2013-01-22 add button to show stats
 (D) 2013-02-18 add sort
+(D) 2013-07-15 +tdi toggle complete
 x 2013-01-10 2013-01-09 Handle clicking on empty listbox
 x 2013-01-10 2013-01-09 handle insert from frame focus
 x 2013-01-10 2013-01-09 Make executable in bash
+x 2013-07-18 2013-01-08 add i)nsert to global bind list +tdg

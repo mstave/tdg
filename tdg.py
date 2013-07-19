@@ -27,16 +27,17 @@ class TDTk(object):
         self.help_bar = None
         self.tabs = None
 
-	#mapping of which tab (frame) maps to which todo_file
-	self.tab_file = {}
+        #mapping of which tab (frame) maps to which todo_file
+        self.tab_file = {}
 
         # window for inserting new tasks
         self.add_win = None
 
         # todo file contents
         self.td_file = None
-	self.td_file1 = None
-	self.td_file2 = None
+        self.td_file1 = None
+        self.td_file2 = None
+        self.td_file3 = None
 
         # used for creating new tasks
         self.new_task = tk.StringVar()
@@ -53,15 +54,16 @@ class TDTk(object):
 
     def load(self):
         self.td_file = None
-	self.td_file1 = todo_file.TodoFile()
-	self.td_file2 = todo_file.TodoFile("c:\\dropbox\\todo\\todo.txt")
+        self.td_file1 = todo_file.TodoFile()
+        self.td_file2 = todo_file.TodoFile("c:\\dropbox\\todo\\todo.txt")
+        self.td_file3 = todo_file.TodoFile("todo.txt")
 
     def reload(self, event):
         self.load()
         self.reset_ui()
 
     def active_td_file(self):
-	return self.tab_file[str(self.tabs.select())]
+        return self.tab_file[str(self.tabs.select())]
 
     def save(self):
         self.set_status("Adding new item: ")
@@ -186,12 +188,23 @@ class TDTk(object):
 
         return lbox
 
+    def colorize(self, listb_row):
+        #if listb_row.context and "Ops" in listb_row.context:
+        if listb_row.context:
+            return { "fg" : "navy" }
+        if listb_row.project:
+            return { "fg" : "dark green" }
+
+        return None
+    
     def populate_listbox(self, lbox, priority, include_func, td_file):
         trow = 0
         for row_itr in td_file.todo_item_arr:
             if row_itr.priority == priority:
                 if include_func(row_itr):
                     lbox.insert(trow, row_itr)
+                    if self.colorize(row_itr):
+                        lbox.itemconfig(trow, self.colorize(row_itr))
                     trow += 1
         lbox.master["text"] = "[" + str(trow) + "] " + lbox.master["text"]
 
@@ -233,7 +246,7 @@ class TDTk(object):
         self.reset_ui()
 
     def delete_task(self, event):
-        self.active_td_file.delete_task(
+        self.active_td_file().delete_task(
             self.get_td_array_index(self.get_selected_text(event)))
         self.reset_ui()
 
@@ -261,11 +274,12 @@ class TDTk(object):
 
     def write_file(self, event):
         self.td_file1.write_file()
-	self.td_file2.write_file()
-        self.set_status(self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
+        self.td_file2.write_file()
+        self.td_file3.write_file()
+        self.set_status(self.td_file3.todo_filename + " and " + self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
 
-    def debug2(self, event):	
-	self.set_status("Tab info: " + str(self.tabs.select()) + " " + str(self.tabs.index(self.tabs.select())))
+    def debug2(self, event):    
+        self.set_status("Tab info: " + str(self.tabs.select()) + " " + str(self.tabs.index(self.tabs.select())))
 
     def bind_list_commands(self, lbox):
         lbox.bind("<<ListboxSelect>>", self.list_selected)
@@ -282,7 +296,7 @@ class TDTk(object):
         self.global_binds(lbox)
 
     def global_binds(self, widget):
-	widget.bind("X", self.debug2)
+        widget.bind("X", self.debug2)
         widget.bind("w", self.write_file)
         widget.bind("s", self.write_file)
         widget.bind("i", self.add_task)
@@ -301,23 +315,25 @@ class TDTk(object):
 
     def add_tab(self, root, func, label_text, td_file):
         new_frame = ttk.Frame(root)
-	self.tab_file[str(new_frame)] = td_file
+        self.tab_file[str(new_frame)] = td_file
         self.list_ui(td_file,new_frame, func)
         new_frame.pack(fill=tk.BOTH, expand=1)
         root.add(new_frame, text=label_text)
-	return new_frame
+        return new_frame
 
     def add_all_tabs(self):
         self.tabs = ttk.Notebook(self.frame)
         self.add_tab(self.tabs, lambda arg: (
             not arg.done), "Open: Work", self.td_file1)
         self.add_tab(self.tabs, lambda arg: (
+            not arg.done), "Open: Dropbox", self.td_file2)
+        self.add_tab(self.tabs, lambda arg: (
+            True), "Github tdg", self.td_file3)
+        self.add_tab(self.tabs, lambda arg: (
             arg.done ), "Complete: Work", self.td_file1)
         self.add_tab(
             #self.tabs, lambda arg: arg.context != "home", "All: Work")
             self.tabs, lambda arg: True, "All: Work", self.td_file1)
-        self.add_tab(self.tabs, lambda arg: (
-            not arg.done), "Open: Dropbox", self.td_file2)
         self.add_tab(self.tabs, lambda arg: (
             arg.done ), "Complete: Dropbox", self.td_file2)
         self.add_tab(

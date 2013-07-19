@@ -34,7 +34,7 @@ class TodoFile(object):
     ENV_TD_DIR = 'TODO_DIR'  # pylint: disable-msg=W0511
     last_msg = None
 
-    def __init__(self, f_name="todo.txt"):
+    def __init__(self, f_name=None):
         self.set_filename(f_name)
         self.load_file(self.todo_file_name)
 
@@ -44,18 +44,22 @@ class TodoFile(object):
     def __str__(self):
         return '\n'.join(self.todo_txt_arr) + "\n"
 
-    def set_filename(self, f_name="todo.txt"):
-        try:
-            tddir = os.environ[self.ENV_TD_DIR]
-        except KeyError:
-            tddir = os.path.expanduser("~")
-        self.todo_file_name = os.path.join(tddir, f_name)
-        if not os.path.exists(self.todo_file_name):
-            self.todo_file_name = os.path.join(os.getcwd(), f_name)
-        if not os.path.exists(self.todo_file_name):
-            sys.exit("Error: " + f_name + " not found in $" + self.ENV_TD_DIR + ", "
-                + os.path.expanduser("~") + " or "
-                + os.getcwd())
+    def set_filename(self, f_name=None):
+        if f_name:
+            self.todo_file_name = f_name
+        else:
+            f_name = "todo.txt"
+            try:
+                tddir = os.environ[self.ENV_TD_DIR]
+            except KeyError:
+                tddir = os.path.expanduser("~")
+            self.todo_file_name = os.path.join(tddir, f_name)
+            if not os.path.exists(self.todo_file_name):
+                self.todo_file_name = os.path.join(os.getcwd(), f_name)
+            if not os.path.exists(self.todo_file_name):
+                sys.exit("Error: " + f_name + " not found in $" + self.ENV_TD_DIR + ", "
+                    + os.path.expanduser("~") + " or "
+                    + os.getcwd())
 
     def get_gui_index(self, query):
         index = 0
