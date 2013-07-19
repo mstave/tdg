@@ -91,7 +91,6 @@ class TDCli(object):
             'undo':     self.cmd_undo
         }.get(self.cmd, self.cmd_default)()
 
-
     def parse(self):
         '''
         handle command-line attributes

@@ -36,10 +36,10 @@ class TodoItem(object):  # pylint: disable-msg=R0902
 
     def __str__(self):
         return self.todo_txt_line
-    
+
     def __len__(self):
         return len(self.todo_txt_line)
-    
+
     def get_todo_dot_txt_line(self):
         ret_str = ""
         if self.done:
