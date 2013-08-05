@@ -276,7 +276,7 @@ class TDTk(object):
         self.td_file1.write_file()
         self.td_file2.write_file()
         self.td_file3.write_file()
-        self.set_status(self.td_file3.todo_filename + " and " + self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
+        self.set_status(self.td_file3.todo_file_name + " and " + self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
 
     def debug2(self, event):    
         self.set_status("Tab info: " + str(self.tabs.select()) + " " + str(self.tabs.index(self.tabs.select())))
