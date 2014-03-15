@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <style type="text/css">
+            body {
+                font-family:  Arial, Verdana, sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+            <div id="outer">
+                <p id="comms" >Todo status</p>
+            </div>
+            <div id="todo_div" >
+            <!--
+            _done: false
+_priority: "C"
+completion_date: "None"
+context: "None"
+creation_date: "2013-06-25"
+gui_index: "None"
+project: "tdg"
+task: "Color code by project +tdg
+-->
+
+            </div>
+            <script type="text/javascript">
+                            var todo_data = {{ td_data|tojson|safe }};</script>
+            <script src="static/td.js"></script>
+            <!--
+            <script type="text/javascript">
+                var todo_data = {{ td_data|tojson|safe }};
+                var td_table=d3.select("#todo_div").append("table");
+                var thead = td_table.append("thead");
+                    thead.append("th").text("ID");
+                    thead.append("th").text("Done");
+                    thead.append("th").text("Prority");
+                    thead.append("th").text("Text");
+                    thead.append("th").text("Creation Date");
+
+
+                update = function(d) {
+                    if (typeof(d) == "boolean")
+                        return("<input type='checkbox'" + ( d ? " checked />" : "/>"))
+                    else
+                        return d
+                })
+
+                }
+                var rows = td_table.selectAll("tr").data(todo_data);
+                rows.enter().append("tr");
+                rows.exit().remove();
+
+                var td = rows.selectAll("td")
+                            .data(function(d, p) {
+                                return  [p, d._done, d._priority, d.task, d.creation_date];
+                            })
+                td.enter().append("td")
+                            .html(function(d) {
+                td.exit().remove()
+                rows.on('click', function(d,i) {
+                    // alert(i);
+                    // d3.select(this) -
+                });
+                var curr_row = 0;
+                // window.focus();
+                d3.select("body").on('keydown', function() {
+                    // alert(d3.event.keyCode);
+                    k = d3.event.keyCode;
+                    if  (k >= 65 && k <= 69) {
+                        todo_data[curr_row]._priority = ch
+                    }
+                    switch (d3.event.keyCode) {
+                      case 65: {
+                        // alert(todo_data[curr_row]._priority);
+                        todo_data[curr_row]._priority='(a)';
+                        rows.selectAll("td")
+                            .data(function(d, p) {
+                                return  [p, d._done, d._priority, d.task, d.creation_date];
+                            })
+                            .html(function(d) {
+                                if (typeof(d) == "boolean")
+                                    return("<input type='checkbox'" + ( d ? " checked />" : "/>"))
+                                else
+                                    return d;
+                            });
+                        break;
+                        }
+                    }
+                });
+
+                rows.on('mouseover', highlight)
+                rows.on('mouseout', unlight)
+                // d3.selectAll("tr").select("td").insert("input").attr("type", "checkbox");
+                function highlight(d, i) {
+                    d3.select("#comms").text("Row " + i);
+                    curr_row = i;
+                    d3.select(this).style('background-color', 'gray').style('color','white');
+
+                }
+                function unlight(d, i){
+                    d3.select(this).style('background-color', 'white').style('color','black');
+
+                }
+                td.exit().remove()
+            </script>
+            -->
+    </body>
+</html>

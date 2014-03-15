@@ -68,9 +68,9 @@ class TestTodoFile(unittest.TestCase):  # pylint: disable-msg=R0904
         try:
             temp_file = tempfile.NamedTemporaryFile(mode="w",
                                                    delete=False)
-            test_str_1 = "(B) 2012-02-05 @home Xbox repair"
+            test_str_1 = "(B) 2012-02-05 Xbox repair @home"
             test_item_1 = TodoItem(test_str_1)
-            test_str_2 = "(B) 2012-02-05 @work Xbox repair"
+            test_str_2 = "(B) 2012-02-05 Xbox repair @work"
             test_item_2 = TodoItem(test_str_2)
             test_td_file = TodoFile(temp_file.name)
             test_td_file.append(test_item_1)
@@ -96,6 +96,65 @@ class TestTodoFile(unittest.TestCase):  # pylint: disable-msg=R0904
         finally:
             temp_file.close()
             os.unlink(temp_file.name)
+
+    def test_nested(self):
+        #   this doesn't really test anything yet
+        try:
+            temp_file = tempfile.NamedTemporaryFile(mode="w",
+                                                    delete=False)
+            data_to_nest = '''
+(B) 2014-03-01 First B task @home
+(B) 2014-03-01 Second B task @home
+(A) 2014-04-02 Do today @home
+(C) 2014-02-04 Third tier @work
+'''
+            visual = '''
+filename
+    (A Home)
+        Do today
+        (B Home)
+            First B task
+            Second B task
+    (A Work)
+        (B Work)
+            (C Work)
+                Third Tier
+        '''
+            correct = {"name": temp_file.name,
+                       "children": [
+                           {"name": "(A) @home",
+                            "children": [
+                                {"name": "Do today", "size": 100},
+                                {"name": "(B) @home",
+                                    "children": [
+                                        {"name": "First B task", "size": 100},
+                                        {"name": "Second B task", "size": 100}
+                                    ]
+                                 }
+                            ],
+                            },
+                           {"name": "(A) @work",
+                                    "children": [
+                                        {"name": "(B) @work",
+                                            "children": [
+                                                {"name": "(C) @work",
+                                                    "children": [
+                                                        {"name": "Third Tier",
+                                                            "size": 100}
+                                                    ]
+                                                 }
+                                            ]
+                                         }
+                                    ]
+                            }
+                       ]
+                       }
+            temp_file.write(data_to_nest)
+            test_td_file = TodoFile(temp_file.name)
+            self.assertIsNotNone(test_td_file)
+            self.assertIsNotNone(test_td_file.todo_item_arr)
+        finally:
+            temp_file.close()
 
     def tearDown(self):  # pylint: disable-msg=C0103
         '''
