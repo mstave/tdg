@@ -1,14 +1,82 @@
 // var todo_data = {{ td_data|tojson|safe }};
-var td_table=d3.select("#todo_div").append("table");
+var todo = {}       // Namespace for all this
 
-var thead = td_table.append("thead");
-    thead.append("th").text("ID");
-    thead.append("th").text("Done");
-    thead.append("th").text("Prority");
-    thead.append("th").text("Text");
-    thead.append("th").text("Creation Date");
+todo.init = function() {
+    d3.json("todo.json", function(error, json) {
+        todo.todo_data=json.dd;     // json todo_file
+        if (error) {
+            console.warn(error);
+            return alert(error);
+        }
+        todo.create_table();
+    })
+}
 
-function update_td_html(d, p) {
+todo.create_table = function() {
+    todo.curr_row = 0;      // row that is selected
+    todo.td_table=d3.select("#todo_div").append("table");
+    // todo: create an array of column names and  use thead.data()
+    todo.thead = todo.td_table.append("thead");
+
+    todo.thead.append("th").text("ID");
+    todo.thead.append("th").text("X");
+    todo.thead.append("th").text("Pri");
+    todo.thead.append("th").text("Task");
+    todo.thead.append("th").text("Created");
+
+    todo.rows = todo.td_table.selectAll("tr").data(todo.todo_data);
+    todo.rows.enter().append("tr")
+    todo.rows.exit().remove();
+
+    todo.td = todo.rows.selectAll("td")
+            .data(function(d, p) {
+                // d.gui_index = p
+                return  [p, d._done, d._priority, d.task, d.creation_date];
+            })
+
+    todo.td.enter().append("td")
+            .html(todo.update_td_html);
+
+    todo.td.exit().remove()
+
+// todo should this be window.on?
+    d3.select("body").on('keydown', function(d,i) {
+        // alert(d3.event.keyCode);
+        k = d3.event.keyCode;
+        if  (k >= 65 && k <= 69) {
+            todo.todo_data[todo.curr_row]._priority = String.fromCharCode(k);
+        }
+        switch (d3.event.keyCode) {
+            case 37:      // left
+                todo.update_all();  // for debugging: force an update
+                break;    // right
+            case 39:
+                break;
+            case 38:      // up
+                if (todo.curr_row > 0) {
+                    todo.curr_row--;
+                }
+                break;
+
+            case 40:      // down
+                if (todo.curr_row < todo.todo_data.length)
+                    todo.curr_row++;
+                break;
+        }
+        todo.update_all();
+    });
+
+    todo.rows.on('mouseover', todo.highlight)
+    // todo fix this to test highlight prop
+    todo.rows.on('click', function(d,i) {
+        // if (todo.curr_item != null)
+        //     todo.curr_item.classed("myhighlight", false);
+        // todo.curr_item = d3.select(this).classed("myhighlight",true);
+    });
+
+}
+
+todo.update_td_html = function(d, p) {
     d.gui_index = p;
     if (typeof(d) == "boolean")
         return("<input type='checkbox'" + ( d ? " checked />" : "/>"));
@@ -16,92 +84,26 @@ function update_td_html(d, p) {
         return d;
 };
 
-var rows = td_table.selectAll("tr").data(todo_data);
-rows.enter().append("tr")
-rows.exit().remove();
-
-var td = rows.selectAll("td")
-            .data(function(d, p) {
-                // d.gui_index = p
-                return  [p, d._done, d._priority, d.task, d.creation_date];
-            })
-
-td.enter().append("td")
-            .html(update_td_html);
-
-td.exit().remove()
-var d_item;
-rows.on('click', function(d,i) {
-    // alert(i);
-    // d3.select(this)
-    d_item=d;
-
-    if (curr_item != null)
-        curr_item.classed("myhighlight", false);
-    curr_item = d3.select(this).classed("myhighlight",true);
-
-});
-
-var curr_row = 0;
-var curr_item;
-
-d3.select("body").on('keydown', function(d,i) {
-    // alert(d3.event.keyCode);
-    k = d3.event.keyCode;
-    if  (k >= 65 && k <= 69) {
-        todo_data[curr_row]._priority = String.fromCharCode(k);
-    }
-    switch (d3.event.keyCode) {
-        case 37:
-            break; // left
-        case 39:
-            break; // right
-        case 38:
-            if (curr_row > 0)
-                console.log("setting curr_row to " + (curr_row - 1));
-                // curr_item = curr_item.previous_sibling;
-                curr_row--;
-            break; // up
-        case 40:
-            if (curr_row < todo_data.length)
-                curr_item = curr_item.next_sibling;
-                curr_row++;
-            break; // down
-    update_all();
-    }
-
-});
-
-rows.on('mouseover', highlight)
-// rows.on('mouseout', unlight)
-// d3.selectAll("tr").select("td").insert("input").attr("type", "checkbox");
-
-function update_all() {
-    td_table.selectAll("tr")
-            .data(todo_data)
+todo.update_all = function() {
+    console.log("Updating all");
+    todo.td_table.selectAll("tr")
+            .data(todo.todo_data)
             .classed("myhighlight", function(d,i) {
-                 console.log("i == " + i + " curr_row = " + curr_row);
-                 return curr_row == i;
+                 // console.log("i == " + i + " curr_row = " + curr_row);
+                 return todo.curr_row == i;
              });
-    rows.selectAll("td")
+    todo.rows.selectAll("td")
         .data(function(d, p) {
             return  [p, d._done, d._priority, d.task, d.creation_date];
         })
-        .html(update_td_html);
+        .html(todo.update_td_html);
 }
 
-function highlight(d, i) {
+todo.highlight = function(d, i) {
     d3.select("#comms").text("Row " + i);
-    curr_row = i;
-    update_all()
-    // if (curr_item != null)
-        // curr_item.classed("myhighlight", false);
-    // curr_item = d3.select(this).classed("myhighlight",true);
-    // curr_item = this;
-    // d3.select(this).style('background-color', 'gray').style('color','white');
+    todo.curr_row = i;
+    todo.update_all()
 
 }
-function unlight(d, i){
-    d3.select(this).style('background-color', 'white').style('color','black');
-}
-td.exit().remove();
+
+todo.init();

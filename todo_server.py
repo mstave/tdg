@@ -1,11 +1,13 @@
 import flask
 import todo_file
-import json
+from flask import json
 
 todo_app = flask.Flask(__name__)
 
 
 def serialize(obj):
+    if isinstance(obj, int):
+        return obj
     if isinstance(obj, (bool, int, long, float, basestring)):
         return obj
     elif isinstance(obj, dict):
@@ -23,10 +25,13 @@ def serialize(obj):
         return repr(obj)  # Don't know how to handle, convert to string
     return json.dumps(serialize(obj))
 
+
 @todo_app.route("/")
 def serve_tds():
     tdf = todo_file.TodoFile("todo.txt")
-    return flask.render_template("todo.html", td_data=serialize(tdf.todo_item_arr))
+    print("Preparing to render")
+    # return flask.render_template("todo.html")
+    return flask.render_template("todo.html")
     # return flask.render_template("todo.html", td_data=flask.json.dumps(tdf.todo_item_arr))
     # return flask.render_template("todo.html", td_data=json.dumps(tdf.todo_txt_arr))
     # return json.dumps(tdf.todo_txt_arr)
@@ -40,6 +45,13 @@ def serve_tds():
 # def icicle():
 #     return flask.render_template("icicle.html")
 
+
+@todo_app.route("/todo.json")
+def todo_json():
+    print("preparing to jsonify")
+    tdf2 = todo_file.TodoFile("todo.txt")
+    # print(tdf2)
+    return json.jsonify(dd=serialize(tdf2.todo_item_arr))
 
 @todo_app.route("/flare_json")
 def sample_json():
