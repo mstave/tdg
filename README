@@ -1,5 +1,5 @@
 TDG: Todo GUI
-Author: Matt Stave (mstave@gmail.com)
+Author: Matthew Stave (mstave@gmail.com)
 
 Goals:
 
@@ -25,3 +25,5 @@ Major Files:
 	tdcli.py     :  A basic command-line interface (work in progress)
 
 	*test.py     :  Unit tests
+
+	README		 :  This file
