@@ -21,9 +21,9 @@ Major Files:
 
 	todo_item.py :	An object that abstracts a to-do item, can parse lines in the todo.txt format
 	todo_file.py :	An object that abstracts an entire to-do list
-	tdg.py    	 :	Tkinter-based GUI
+	tdg.py       :	Tkinter-based GUI
 	tdcli.py     :  A basic command-line interface (work in progress)
 
 	*test.py     :  Unit tests
 
-	README		 :  This file
+	README       :  This file
