@@ -101,8 +101,11 @@ class TodoFile(object):
     def load_file(self, f_name=None):
         try:
             precmd = os.environ["TD_PRELOAD"]
-            self.last_msg = subprocess.check_output(precmd)
+            self.last_msg = subprocess.check_output(precmd, shell=True)
             print self.last_msg
+        except OSError:
+            print "Error running " + precmd
+            exit()
         except KeyError:
             pass
         if f_name is not None:
@@ -122,7 +125,7 @@ class TodoFile(object):
         t_file.close()
         try:
             postcmd = os.environ["TD_POSTSAVE"]
-            self.last_msg = subprocess.check_output(postcmd)
+            self.last_msg = subprocess.check_output(postcmd, shell=True)
             print self.last_msg
         except KeyError:
             pass
