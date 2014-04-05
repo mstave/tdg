@@ -1,8 +1,13 @@
 import flask
 import todo_file
-from flask import json
+import todo_item
+from flask import json, request, g
 
 todo_app = flask.Flask(__name__)
+
+@todo_app.before_request
+def before_request():
+    g.tdf_tdg = None
 
 
 def serialize(obj):
@@ -46,12 +51,34 @@ def serve_tds():
 #     return flask.render_template("icicle.html")
 
 
+@todo_app.route("/modify/<int:td_id>/<td_field>/<td_value>")
+def modify_value(td_id, td_field, td_value):
+    if g.tdf_tdg is None:
+        g.tdf_tdg = todo_file.TodoFile("todo.txt")
+    mod_task = g.tdf_tdg.get_task(td_id)
+    mod_task[td_field] = td_value
+    print("modified td = " + str(mod_task))
+
+
+@todo_app.route("/json.up", methods=['POST'])
+def receives_json():
+    thejson = request.json
+    print('---------- got it ------ ')
+    print("request was" + str(request.__dict__))
+    print("request json was " + str(request.json))
+
+    newTD = todo_item.TodoItem()
+    newTD.parse_json(request.json)
+    print("todo item: " + str(newTD))
+    return "Got it, thanks"
+
 @todo_app.route("/todo.json")
 def todo_json():
     print("preparing to jsonify")
-    tdf2 = todo_file.TodoFile("todo.txt")
+    print "creating g.tdf_tdg"
+    g.tdf_tdg = todo_file.TodoFile("todo.txt")
     # print(tdf2)
-    return json.jsonify(dd=serialize(tdf2.todo_item_arr))
+    return json.jsonify(dd=serialize(g.tdf_tdg.todo_item_arr))
 
 @todo_app.route("/flare_json")
 def sample_json():

@@ -32,7 +32,7 @@ class TestTodoFile(unittest.TestCase):  # pylint: disable-msg=R0904
 
     def test_basics(self):
         self.assertIsNotNone(self.test_item)
-        self.assertEqual("B", 
+        self.assertEqual("B",
             self.test_item.todo_item_arr[0].priority)
         self.assertEqual("home",
             self.test_item.todo_item_arr[0].context)

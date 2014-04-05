@@ -88,15 +88,15 @@ class TestToDoItem(unittest.TestCase):  # pylint: disable-msg=R0904
         self.assertFalse(not_done_item.done)
         self.assertTrue(done_item.done)
         self.assertEqual("home", done_item.context)
-        self.assertEqual("2012-02-12", done_item.creation_date) 
+        self.assertEqual("2012-02-12", done_item.creation_date)
         self.assertEqual(str(done_item), done_str)
         print done_str, str(done_item)
-        
+
     def test_done_2(self):
         test_str = "x 2012-09-27 approve 8194"
         test_item = TodoItem(test_str)
         self.assertEqual("approve 8194", test_item.task)
-        
+
     def test_mark_done(self):
         test_str = "(B) 2012-08-27 @home Xbox repair"
         done_item = TodoItem("x " + TodoItem.curr_date_str() +

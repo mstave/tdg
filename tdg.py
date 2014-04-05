@@ -195,12 +195,12 @@ class TDTk(object):
     def colorize(self, listb_row):
         #if listb_row.context and "Ops" in listb_row.context:
         if listb_row.context:
-            return { "fg" : "navy" }
+            return {"fg": "navy"}
         if listb_row.project:
-            return { "fg" : "dark green" }
+            return {"fg": "dark green"}
 
         return None
-    
+
     def populate_listbox(self, lbox, priority, include_func, td_file):
         trow = 0
         if td_file is None:
@@ -284,7 +284,7 @@ class TDTk(object):
         self.td_file3.write_file()
         self.set_status(self.td_file3.todo_file_name + " and " + self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
 
-    def debug2(self, event):    
+    def debug2(self, event):
         self.set_status("Tab info: " + str(self.tabs.select()) + " " + str(self.tabs.index(self.tabs.select())))
 
     def bind_list_commands(self, lbox):
