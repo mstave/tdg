@@ -10,6 +10,7 @@ def before_request():
     g.tdf_tdg = None
 
 
+
 def serialize(obj):
     if isinstance(obj, int):
         return obj
@@ -70,7 +71,7 @@ def receives_json():
     newTD = todo_item.TodoItem()
     newTD.parse_json(request.json)
     print("todo item: " + str(newTD))
-    return "Got it, thanks"
+    return str(request.json)
 
 @todo_app.route("/todo.json")
 def todo_json():
@@ -570,6 +571,7 @@ def sample_json():
 
     # return json.dumps(other)
     return json.dumps(correct)
+
 
     @todo_app.route("/tsd.js")
     def serve_tdjs():

@@ -37,7 +37,8 @@
                 background-image: none !important;
                 background-color: black !important;
                 color: white !important;
-                border: 9px;
+	/*	pointer-events: none;*/
+		border: 9px;
                 /*background-image: -moz-linear-gradient(50% 0%, gray, #F4F4F4);*/
                 /*background-image: -webkit-linear-gradient(50% 0%, gray, #F4F4F4);*/
                 /*background-image: -webkit-linear-gradient(top, rgb(255, 255, 255), rgb(230, 230, 230));*/
