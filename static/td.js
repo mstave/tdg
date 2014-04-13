@@ -40,13 +40,12 @@ todo.create_table = function() {
             .html(todo.update_td_html)
             .on("change", todo.change_data );
 
-    todo.td.exit().remove()
+    todo.td.exit().remove();
+    todo.col_count = -1;
+    todo.update_all();
+}
 
-    todo.unpause_events();
-
-// todo should this be window.on?
-
-    todo.toggle_complete = function() {
+todo.toggle_complete = function() {
         todo.todo_data[todo.curr_row]._done = !todo.todo_data[todo.curr_row]._done;
     }
 
@@ -57,16 +56,15 @@ todo.create_table = function() {
     //     // todo.update_all();    
     // });
 
-}
-todo.col_count = -1;
 
-todo.pause_events = function() {
-    todo.rows.on('click', null);
-    todo.rows.on('mouseover', null);
 
-    d3.select("body").on('keydown',null);
-    console.log("Pausing events");
-}
+// todo.pause_events = function() {
+//     todo.rows.on('click', null);
+//     todo.rows.on('mouseover', null);
+
+//     d3.select("body").on('keydown',null);
+//     console.log("Pausing events");
+// }
 
 todo.change_data = function (d, p) {
 		//this.onclick=null;
@@ -77,7 +75,6 @@ todo.change_data = function (d, p) {
                 });
 		todo.clicked = -1;
                 todo.update_all();
-                todo.unpause_events();
             }
 
 todo.update_data = function(row, column, new_value) {
@@ -99,26 +96,23 @@ todo.update_data = function(row, column, new_value) {
 
 var theevent = null;
 
-todo.unpause_events = function ()  {
-    console.log("Unpausing events");
-    todo.rows.on('mouseover', todo.highlight);
-    todo.rows.on('click', function(d,i) {
-        console.log('row click');
-	console.log(d3.event.target);
-	if (!(d3.event.target instanceof HTMLOptionElement)) {
-	    if (!(d3.event.target instanceof HTMLInputElement)) {
-	        todo.clicked = i;
-	        todo.pause_events();
-	    }
-        }
-	todo.update_all();
-    });
+// todo.unpause_events = function ()  {
+//     console.log("Unpausing events");
     
-    d3.select("body").on('keydown', function(d,i) {
+
+
+todo.handle_key = function (d, i) {
     k = d3.event.keyCode;
     if  (k >= 65 && k <= 69) {
          todo.todo_data[todo.curr_row]._priority = String.fromCharCode(k);
     }
+    console.log('key');
+    console.log(d3.event.target);
+    var ignore_key = false;
+    if (d3.event.target instanceof HTMLInputElement) { 
+	return;
+    }
+
     switch (k) {
         case 32:      // space
             // alert("spaced!");
@@ -144,11 +138,24 @@ todo.unpause_events = function ()  {
              d3.event.preventDefault();
              window.scrollBy(0,20);
              break;
+	default:
+	     ignore_key = true;
+	     break;
         }
 	todo.clicked = -1;
-        todo.update_all();
-    });
-}
+        if (!ignore_key) {
+	    console.log("need to repaint due to key");
+	    todo.update_all();
+	}
+ }
+
+todo.edit_click = function (d,f) {
+    console.log("edit click");
+    console.log(this);
+    console.log(d);
+    console.log(f);
+    todo.update_all();
+} 
 
 todo.update_td_html = function(d, p) {
     if ( todo.col_count++ > 3 ) { //number of columns
@@ -160,26 +167,27 @@ todo.update_td_html = function(d, p) {
 
     switch (todo.col_count) {
         case 0:  // ID
-            if (todo.clicked == todo.datarow) {
+            return '<button style="visbility:hidden" class="edit_button">Delete</button>' + "&nbsp;" +  d
+	    if (todo.clicked == todo.datarow) {
 	         return "<input type='button' value='Cancel Edit' onclick='todo.edit_done()'/>";
             } else
 		return d;
         case 1:  // Done
             return("<input type='checkbox'" + ( d ? " checked />" : "/>"));
         case 2:  // Priority
-            if (todo.clicked == todo.datarow) {    // edit mode
+            if (todo.clicked == todo.datarow) {    // edit mo/de
                 return todo.create_select_pri(d);
             } else
                 return d;
         case 3:  // Task
             if (todo.clicked == todo.datarow ) {
                 // return ('<input id="toedit" onclick="focus()" type="text" value="' + d + '"/>');
-                return ('<input type="text" value="' + d + '"/>');
+                return ('<input type="text" size= ' + ( 10 + d.length) + ' value="' + d + '"/>');
             } else
                 return d;
         case 4:  // Created
             if (todo.clicked == todo.datarow) {
-                return ('<input type="text" value="' + d + '"/>');
+                return ('<input type="date" value="' + d + '"/>');
             } else
                 return d;
         }
@@ -190,15 +198,31 @@ todo.edit_done = function() {
     todo.clicked = -1;
     todo.unpause_events();
     todo.update_all();
+    this.focus();
 }
 
+var zzz = 0;
 
 todo.update_all = function() {
+    
+    console.log("update_all");
+    d3.select("body").on('keydown',todo.handle_key);
+    
     todo.td_table.selectAll("tr")
-            .data(todo.todo_data)
-            .classed("myhighlight", function(d,i) {
-                 return todo.curr_row == i;
-             });
+        .data(todo.todo_data)
+	.on('mouseover', todo.highlight)
+        .on('click', function(d,i) {
+            console.log('row click');
+	    console.log(d3.event.target);
+	    if (d3.event.target instanceof HTMLTableCellElement) {
+	        todo.clicked = i;
+		todo.update_all();
+            }
+	})
+        .classed("myhighlight", function(d,i) {
+             return todo.curr_row == i;
+         });
+
 
     todo.rows.selectAll("td")
         .data(function(d, i) {
@@ -206,10 +230,21 @@ todo.update_all = function() {
         })
         .html(todo.update_td_html)
         .on("change", todo.change_data );
+    
+    todo.td_table.selectAll(".edit_button")
+	.on("click", todo.edit_click);
+
+    todo.td_table.selectAll(".edit_button")
+        .classed("hide_button", function(d,i) {
+    	        return todo.curr_row != i;
+    	 });
+    
 
 }
 
 todo.highlight = function(d, i) {
+    if (todo.curr_row == i)
+	return;
     todo.curr_row = i;
     todo.update_all()
 
