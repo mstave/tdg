@@ -60,18 +60,56 @@ def modify_value(td_id, td_field, td_value):
     mod_task[td_field] = td_value
     print("modified td = " + str(mod_task))
 
+@todo_app.route("/add_new", methods=['GET','POST'])
+def add_new():
+    print "add new"
+    newTD = todo_item.TodoItem()
+    print request
+    print request.form
+    print request.form.get('task')
+    newTD.task = request.form.get('task')
+    newTD.priority = request.form.get('priority')
+    newTD.project = request.form.get('project')
+    print newTD.task
+    if g.tdf_tdg is None:
+        g.tdf_tdg = todo_file.TodoFile("todo.txt")
+    print "adding " 
+    print newTD.task
+
+    print newTD
+    g.tdf_tdg.append(newTD)
+    print g.tdf_tdg.todo_txt_arr
+    g.tdf_tdg.write_file()
+
+    return flask.redirect("/")
+
+
 
 @todo_app.route("/json.up", methods=['POST'])
 def receives_json():
-    thejson = request.json
-    print('---------- got it ------ ')
+    print "made it"
+    print "preass"
     print("request was" + str(request.__dict__))
-    print("request json was " + str(request.json))
+    try:
+        thejson = request.json
+        print "postass"
+    # print('---------- got it ------ ')
+        print "trying...."
+        print("request json was " + str(request.json))
+    except:
+        print "error parsing " + str(request.__dict__)
 
     newTD = todo_item.TodoItem()
     newTD.parse_json(request.json)
     print("todo item: " + str(newTD))
-    return str(request.json)
+    if g.tdf_tdg is None:
+        g.tdf_tdg = todo_file.TodoFile("todo.txt")
+    g.tdf_tdg.update_task(request.json.get('gui_index', -1), newTD)
+    g.tdf_tdg.update_todo_txt_arr()
+    g.tdf_tdg.write_file()
+
+    return json.jsonify(dd=serialize(g.tdf_tdg.todo_item_arr))
+#    return str(request.json)
 
 @todo_app.route("/todo.json")
 def todo_json():

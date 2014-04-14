@@ -158,13 +158,19 @@ class TodoItem(object):  # pylint: disable-msg=R0902
             self.task = self.task.strip()
 
     def parse_json(self, json_data):
+        for field in json_data:
+            if json_data[field] == "None":
+                json_data[field] = None
         self.task = json_data.get('task', None)
-        self.priority = json_data.get('priority', None)
+        self.priority = json_data.get('_priority', None)
         self.creation_date = json_data.get('creation_date', None)
         self.completion_date = json_data.get('completion_date', None)
         self.context = json_data.get('context', None)
+        self.done = json_data.get('_done', None)
+        self.project = json_data.get('project', None)
 
-    def create_today(self):
+
+    def create_today(self): 
         self.creation_date = self.curr_date_str()
 
     @classmethod
