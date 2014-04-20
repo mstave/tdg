@@ -67,15 +67,15 @@ todo.toggle_complete = function() {
 // }
 
 todo.change_data = function (d, p) {
-		//this.onclick=null;
-                todo.clicked=this.parentElement.rowIndex;
-                todo.tempsave = todo.todo_data[todo.clicked];
-		todo.update_data(todo.clicked, p, d3.event.target.value);
-		d3.xhr("/json.up").header('content-type','application/json').post(JSON.stringify(todo.todo_data[todo.clicked]), function(error, data) {
-                });
-		todo.clicked = -1;
-                todo.update_all();
-            }
+    //this.onclick=null;
+    //todo.clicked=this.parentElement.rowIndex;
+    todo.tempsave = todo.todo_data[todo.clicked];
+    todo.update_data(todo.clicked, p, d3.event.target.value);
+    d3.xhr("/json.up").header('content-type','application/json').post(JSON.stringify(todo.todo_data[todo.clicked]), function(error, data) {
+    });
+    todo.clicked = -1;
+    todo.update_all();
+}
 
 todo.update_data = function(row, column, new_value) {
     switch (column) {
@@ -164,12 +164,8 @@ todo.update_td_html = function(d, p) {
     switch (todo.col_count) {
         case 0:  // ID
             return '<button style="visbility:hidden" onclick="todo.delete_todo(' + d + ')" class="edit_button">Delete</button>' + "&nbsp;" +  d
-	    if (todo.clicked == todo.datarow) {
-	         return "<input type='button' value='Cancel Edit' onclick='todo.edit_done()'/>";
-            } else
-		return d;
         case 1:  // Done
-            return("<input type='checkbox'" + ( d ? " checked />" : "/>"));
+            return("<input class='done_check' type='checkbox'" + ( d ? " checked />" : "/>"));
         case 2:  // Priority
             if (todo.clicked == todo.datarow) {    // edit mo/de
                 return todo.create_select_pri(d);
@@ -191,18 +187,13 @@ todo.update_td_html = function(d, p) {
 
 todo.delete_todo = function(del_row) {
     var delval = "none";
+    todo.clicked = del_row
     d3.xhr("/del/" + del_row).post(function(error,data) {
 	todo.reload();
-});
+    });
    // setTimeout(todo.reload,5000);
 //    location.reload(true);
 
-}
-todo.edit_done = function() {
-    todo.clicked = -1;
-    todo.unpause_events();
-    todo.update_all();
-    this.focus();
 }
 
 todo.reload = function() {
@@ -243,7 +234,9 @@ todo.update_all = function() {
         .classed("hide_button", function(d,i) {
     	        return todo.curr_row != i;
     	 });
-    
+
+    todo.td_table.selectAll("done_check")
+        .on("change", todo.change_data );
 
 }
 
@@ -251,6 +244,7 @@ todo.highlight = function(d, i) {
     if (todo.curr_row == i)
 	return;
     todo.curr_row = i;
+    todo.clicked = i;
     todo.update_all()
 
 }
