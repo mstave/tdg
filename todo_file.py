@@ -111,6 +111,7 @@ class TodoFile(object):
             self.todo_file_name = f_name
         t_file = open(self.todo_file_name, "r")
         getlines = t_file.readlines()
+        getlines.sort()
         #getlines = open(self.todo_file_name).readlines()
         self.todo_txt_arr = [line.strip() for line in getlines]
         self.update_todo_item_arr()

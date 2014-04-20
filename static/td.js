@@ -106,8 +106,6 @@ todo.handle_key = function (d, i) {
     if  (k >= 65 && k <= 69) {
          todo.todo_data[todo.curr_row]._priority = String.fromCharCode(k);
     }
-    console.log('key');
-    console.log(d3.event.target);
     var ignore_key = false;
     if (d3.event.target instanceof HTMLInputElement) { 
 	return;
@@ -115,7 +113,6 @@ todo.handle_key = function (d, i) {
 
     switch (k) {
         case 32:      // space
-            // alert("spaced!");
             todo.toggle_complete();
             d3.event.preventDefault();
             break;
@@ -144,7 +141,6 @@ todo.handle_key = function (d, i) {
         }
 	todo.clicked = -1;
         if (!ignore_key) {
-	    console.log("need to repaint due to key");
 	    todo.update_all();
 	}
  }
@@ -167,7 +163,7 @@ todo.update_td_html = function(d, p) {
 
     switch (todo.col_count) {
         case 0:  // ID
-            return '<button style="visbility:hidden" onclick="todo.delete_todo()" class="edit_button">Delete</button>' + "&nbsp;" +  d
+            return '<button style="visbility:hidden" onclick="todo.delete_todo(' + d + ')" class="edit_button">Delete</button>' + "&nbsp;" +  d
 	    if (todo.clicked == todo.datarow) {
 	         return "<input type='button' value='Cancel Edit' onclick='todo.edit_done()'/>";
             } else
@@ -193,30 +189,36 @@ todo.update_td_html = function(d, p) {
         }
 };
 
-todo.delete_todo = function() {
-    console.log(this)
+todo.delete_todo = function(del_row) {
+    var delval = "none";
+    d3.xhr("/del/" + del_row).post(function(error,data) {
+	todo.reload();
+});
+   // setTimeout(todo.reload,5000);
+//    location.reload(true);
+
 }
 todo.edit_done = function() {
-    alert("done");
     todo.clicked = -1;
     todo.unpause_events();
     todo.update_all();
     this.focus();
 }
 
+todo.reload = function() {
+    location.reload(true);
+}
+
 var zzz = 0;
 
 todo.update_all = function() {
     
-    console.log("update_all");
     d3.select("body").on('keydown',todo.handle_key);
     
     todo.td_table.selectAll("tr")
         .data(todo.todo_data)
 	.on('mouseover', todo.highlight)
         .on('click', function(d,i) {
-            console.log('row click');
-	    console.log(d3.event.target);
 	    if (d3.event.target instanceof HTMLTableCellElement) {
 	        todo.clicked = i;
 		todo.update_all();
