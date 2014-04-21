@@ -7,7 +7,14 @@ todo_app = flask.Flask(__name__)
 
 @todo_app.before_request
 def before_request():
-    g.tdf_tdg = None
+    g.tdfile = todo_file.TodoFile()
+    g.dirty = False
+    
+@todo_app.after_request
+def after_request(response):
+    if g.dirty == True:
+        g.tdfile.write_file();
+    return response
 
 
 
@@ -33,20 +40,14 @@ def serialize(obj):
 
 @todo_app.route("/del/<int:td_id>", methods=['GET','POST'])
 def delete_td(td_id):
-    print "delete" + str(td_id)
-    if g.tdf_tdg is None:
-        g.tdf_tdg = todo_file.TodoFile("todo.txt")
-    g.tdf_tdg.delete_task(td_id);
-    
-    g.tdf_tdg.write_file();
+    g.tdfile.delete_task(td_id);
+    g.dirty = True;
     return flask.redirect("/")
 
 
 @todo_app.route("/")
 def serve_tds():
-    tdf = todo_file.TodoFile("todo.txt")
     return flask.render_template("todo.html")
-
 
 @todo_app.route("/add_new", methods=['GET','POST'])
 def add_new():
@@ -54,11 +55,9 @@ def add_new():
     newTD.task = request.form.get('task')
     newTD.priority = request.form.get('priority')
     newTD.project = request.form.get('project')
-    newTD.create_today();
-    if g.tdf_tdg is None:
-        g.tdf_tdg = todo_file.TodoFile("todo.txt")
-    g.tdf_tdg.append(newTD)
-    g.tdf_tdg.write_file()
+    newTD.create_today()
+    g.tdfile.append(newTD)
+    g.dirty = True;
 
     return flask.redirect("/")
 
@@ -77,20 +76,15 @@ def receives_json():
 
     newTD = todo_item.TodoItem()
     newTD.parse_json(request.json)
-    print("todo item: " + str(newTD))
-    if g.tdf_tdg is None:
-        g.tdf_tdg = todo_file.TodoFile("todo.txt")
-    g.tdf_tdg.update_task(request.json.get('gui_index', -1), newTD)
-    g.tdf_tdg.update_todo_txt_arr()
-    g.tdf_tdg.write_file()
+    g.tdfile.update_task(request.json.get('gui_index', -1), newTD)
+    g.tdfile.update_todo_txt_arr()
+    g.dirty = True;
 
-    return json.jsonify(dd=serialize(g.tdf_tdg.todo_item_arr))
-#    return str(request.json)
+    return json.jsonify(dd=serialize(g.tdfile.todo_item_arr))
 
 @todo_app.route("/todo.json")
 def todo_json():
-    g.tdf_tdg = todo_file.TodoFile("todo.txt")
-    return json.jsonify(dd=serialize(g.tdf_tdg.todo_item_arr))
+    return json.jsonify(dd=serialize(g.tdfile.todo_item_arr))
 
 
 @todo_app.route("/tsd.js")
