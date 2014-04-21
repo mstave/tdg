@@ -3,10 +3,12 @@
                 font-family:  Arial, Verdana, sans-serif;
             }
             table {
-                width: 85%;
+                width: 95%;
                 margin-left: auto;
                 margin-right: auto;
-                border: 5px;
+                border: 1px;
+		border-style: solid;
+		
             }
             td, th {
                 border-top-width: 1px;
@@ -25,12 +27,17 @@
             th {
                 font-size: large;
                 font-weight: bold;
+		background: #293D3D;
+		/* background: #669999; */
+		color: white;
             }
             tr {
                 /*background-image: -moz-linear-gradient(50% 0%, #FFF, #F4F4F4);*/
+		background: #F0F5F5;
+
             }
             table tr:nth-child(odd) {
-                 background: #eee;
+                 background: #D1E0E0;
             }
             .myhighlight {
                 background: none !important;
@@ -44,7 +51,7 @@
                 /*background-image: -webkit-linear-gradient(top, rgb(255, 255, 255), rgb(230, 230, 230));*/
             }
             #todo_div {
-                background-color: #F8F8F8;
+                /*background-color: #F8F8F8;*/
                 position: absolute;
                 /*overflow-x: auto;*/
                 /*overflow-y: scroll;*/
@@ -68,9 +75,16 @@
                 padding-left: 15px;
             }
             #buttons_span {
-                padding-right: 15px;
+                padding-right: 5px;
                 float: right;
+		border-style: solid;
+		border-width: 1px;
+		background-color: #F0F5F5;
+		width: 650px;
             }
 	    .hide_button {
 		visibility: hidden;
+	    }
+	    #top_div {
+		padding-right: 80px;
 	    }

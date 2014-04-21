@@ -9,10 +9,11 @@
     </head>
     <body>
         <header id="status">
+	  <div id="top_div">
             <span id="comms_span">
                 <label id="comms" >Todo status</label>
             </span>
-            <span id="buttons_span">
+            <span id="buttons_span" align="center">
 	      <form action="/add_new" method="post" >
 		<label for="priority">Priority:</label>
 		<select id="priority" name="priority">
@@ -29,6 +30,7 @@
 		<input type="submit" value="Add New"></input>
 	      </form>
             </span>
+	  </div>
         </header>
         <div id="todo_div" width="90%">
             <!--

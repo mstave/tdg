@@ -54,6 +54,7 @@ def add_new():
     newTD.task = request.form.get('task')
     newTD.priority = request.form.get('priority')
     newTD.project = request.form.get('project')
+    newTD.create_today();
     if g.tdf_tdg is None:
         g.tdf_tdg = todo_file.TodoFile("todo.txt")
     g.tdf_tdg.append(newTD)
