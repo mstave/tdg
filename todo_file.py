@@ -19,6 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import re
 import shutil
 import subprocess
@@ -99,19 +100,15 @@ class TodoFile(object):
 
     def load_file(self, f_name=None):
         try:
-            precmd = os.environ["TD_PRELOAD"]
+            precmd = os.path.expanduser(os.environ["TD_PRELOAD"])
             self.last_msg = subprocess.check_output(precmd, shell=True)
             print self.last_msg
-        except OSError:
-            print "Error running " + precmd
-            exit()
         except KeyError:
             pass
         if f_name is not None:
             self.todo_file_name = f_name
         t_file = open(self.todo_file_name, "r")
         getlines = t_file.readlines()
-        getlines.sort()
         #getlines = open(self.todo_file_name).readlines()
         self.todo_txt_arr = [line.strip() for line in getlines]
         self.update_todo_item_arr()
