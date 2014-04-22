@@ -16,15 +16,15 @@ todo.init = function() {
 
 todo.create_table = function() {
     todo.curr_row = 0;      // row that is selected
-    todo.td_table=d3.select("#todo_div").append("table");
+    todo.td_table=d3.select("#todo_div").append("table").attr("id","main_table");
     // todo: create an array of column names and  use thead.data()
     todo.thead = todo.td_table.append("thead");
 
-    todo.thead.append("th").text("ID");
-    todo.thead.append("th").text("X");
-    todo.thead.append("th").text("Pri");
-    todo.thead.append("th").text("Task");
-    todo.thead.append("th").text("Created");
+    todo.thead.append("th").text("ID").attr("id","th_id");
+    todo.thead.append("th").text("X").attr("id","th_done");
+    todo.thead.append("th").text("Pri").attr("id","th_pri");
+    todo.thead.append("th").text("Task").attr("id","th_task");
+    todo.thead.append("th").text("Created").attr("id","th_created");
 
     todo.rows = todo.td_table.selectAll("tr").data(todo.todo_data);
     todo.rows.enter().append("tr")
@@ -179,7 +179,7 @@ todo.update_td_html = function(d, p) {
                 return d;
         case 4:  // Created
             if (todo.clicked == todo.datarow) {
-                return ('<input type="date" value="' + d + '"/>');
+                return ('<input size="11" type="date" value="' + d + '"/>');
             } else
                 return d;
         }

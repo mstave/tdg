@@ -88,3 +88,20 @@
 	    #top_div {
 		padding-right: 80px;
 	    }
+	    #th_id {
+		width: 100px;
+	    }
+	    #th_done {
+		width: 20px;
+	    }
+	    #th_pri {
+		width: 40px;
+	    }
+	    #th_task {
+	    }
+	    #th_created {
+		width: 100px;
+            }
+	    #main_table {
+		table-layout: fixed;
+	    }
