@@ -13,6 +13,8 @@ def before_request():
 @todo_app.after_request
 def after_request(response):
     if g.dirty == True:
+        g.tdfile.todo_txt_arr.sort()
+        g.tdfile.update_todo_item_arr()
         g.tdfile.write_file();
     return response
 
