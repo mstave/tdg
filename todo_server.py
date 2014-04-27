@@ -92,5 +92,5 @@ def serve_tdjs():
     return todo_app.send_static_file("td.js")
 
 if __name__ == '__main__':
-    todo_app.run(host="0.0.0.0", debug=True)
+    todo_app.run(host="0.0.0.0", port=5942, debug=True)
 
