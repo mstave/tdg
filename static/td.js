@@ -179,7 +179,7 @@ todo.update_td_html = function(d, p) {
                 return d;
         case 4:  // Created
             if (todo.clicked == todo.datarow) {
-                return ('<input size="11" type="date" value="' + d + '"/>');
+                return ('<input size="8" type="date" value="' + d + '"/>');
             } else
                 return d;
         }
