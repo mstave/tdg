@@ -10,6 +10,7 @@ import tkFont
 import ttk
 import todo_file
 from todo_item import TodoItem
+import os
 
 
 class TDTk(object):
@@ -55,12 +56,15 @@ class TDTk(object):
     def load(self):
         self.td_file = None
         self.td_file1 = todo_file.TodoFile()
-        try:
-            self.td_file2 = todo_file.TodoFile("c:\\dropbox\\todo\\todo.txt")
-        except:
-            self.td_file2 = todo_file.TodoFile("todo.txt")
-            pass
-        self.td_file3 = todo_file.TodoFile("todo.txt")
+	win_dbox = "c:\\dropbox\\todo\\todo.txt"
+	other_dbox = os.path.join(os.getenv("HOME"), "Dropbox/todo/todo.txt")
+	if os.path.isfile(win_dbox):
+       	    self.td_file2 = todo_file.TodoFile(win_dbox)
+	elif os.path.isfile(other_dbox):
+            self.td_file2 = todo_file.TodoFile(other_dbox)
+	else:
+            self.td_file2 = None
+        self.td_file3 = todo_file.TodoFile(os.path.join(os.path.dirname(__file__), "todo.txt"))
 
     def reload(self, event):
         self.load()
@@ -280,9 +284,12 @@ class TDTk(object):
 
     def write_file(self, event):
         self.td_file1.write_file()
-        self.td_file2.write_file()
         self.td_file3.write_file()
-        self.set_status(self.td_file3.todo_file_name + " and " + self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
+        if self.td_file is not None:
+	    self.td_file2.write_file()
+            self.set_status(self.td_file3.todo_file_name + " and " + self.td_file1.todo_file_name + " have been saved")
+        else:
+            self.set_status(self.td_file3.todo_file_name + " and " + self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
 
     def debug2(self, event):
         self.set_status("Tab info: " + str(self.tabs.select()) + " " + str(self.tabs.index(self.tabs.select())))
@@ -331,8 +338,9 @@ class TDTk(object):
         self.tabs = ttk.Notebook(self.frame)
         self.add_tab(self.tabs, lambda arg: (
             not arg.done), "Open: Work", self.td_file1)
-        self.add_tab(self.tabs, lambda arg: (
-            not arg.done), "Open: Dropbox", self.td_file2)
+        if self.td_file2 is not None:
+            self.add_tab(self.tabs, lambda arg: (
+                not arg.done), "Open: Dropbox", self.td_file2)
         self.add_tab(self.tabs, lambda arg: (
             True), "Github tdg", self.td_file3)
         self.add_tab(self.tabs, lambda arg: (
@@ -340,10 +348,11 @@ class TDTk(object):
         self.add_tab(
             #self.tabs, lambda arg: arg.context != "home", "All: Work")
             self.tabs, lambda arg: True, "All: Work", self.td_file1)
-        self.add_tab(self.tabs, lambda arg: (
-            arg.done ), "Complete: Dropbox", self.td_file2)
-        self.add_tab(
-            self.tabs, lambda arg: True, "All: Home", self.td_file2)
+        if self.td_file is not None:
+            self.add_tab(self.tabs, lambda arg: (
+                         arg.done ), "Complete: Dropbox", self.td_file2)
+            self.add_tab(
+                self.tabs, lambda arg: True, "All: Dropbox", self.td_file2)
         self.tabs.pack(fill=tk.BOTH, expand=1)
         self.global_binds(self.tabs)
 
