@@ -37,7 +37,6 @@ class TDCli(object):
     def cmd_ls(self, ls_str=None):
         if ls_str is None:
             ls_str = self.addargs
-        self.td_file.be_quiet = True
         print self.td_file.list_todos(ls_str, True)
 
     def cmd_lspri(self):
