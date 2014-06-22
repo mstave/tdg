@@ -11,7 +11,6 @@ import ttk
 import todo_file
 from todo_item import TodoItem
 import os
-import platform
 
 
 class TDTk(object):
