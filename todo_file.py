@@ -34,9 +34,11 @@ class TodoFile(object):
     ENV_TD_DIR = 'TODO_DIR'  # pylint: disable-msg=W0511
     last_msg = None
 
-    def __init__(self, f_name=None):
+    def __init__(self, f_name=None, be_quiet=False):
+        self.be_quiet = be_quiet
         self.set_filename(f_name)
         self.load_file(self.todo_file_name)
+        
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
@@ -102,7 +104,8 @@ class TodoFile(object):
         try:
             precmd = os.path.expanduser(os.environ["TD_PRELOAD"])
             self.last_msg = subprocess.check_output(precmd, shell=True)
-            print self.last_msg
+            if not self.be_quiet:
+                print self.last_msg
         except KeyError:
             pass
         if f_name is not None:
@@ -154,5 +157,11 @@ class TodoFile(object):
         for todo in self.todo_txt_arr:
             if re.search(rex, todo):
                 temp_arr.append(todo)
+        return '\n'.join(temp_arr) + "\n"
 
+    def ls_pri(self, pri):
+        temp_arr = []
+        for todo in self.todo_item_arr:
+            if (todo.priority == pri):
+                temp_arr.append(str(todo))
         return '\n'.join(temp_arr) + "\n"
