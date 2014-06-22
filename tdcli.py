@@ -25,7 +25,8 @@ class TDCli(object):
         Constructor
         '''
         self.parse()
-        self.td_file = todo_file.TodoFile(self.tdFilename)
+        self.td_file = todo_file.TodoFile(self.tdFilename, True)
+        self.td_file.be_quiet = True
         if self.cmd is not None:
             self.run()
         self.parser = None
@@ -36,7 +37,11 @@ class TDCli(object):
     def cmd_ls(self, ls_str=None):
         if ls_str is None:
             ls_str = self.addargs
+        self.td_file.be_quiet = True
         print self.td_file.list_todos(ls_str, True)
+
+    def cmd_lspri(self):
+        print self.td_file.ls_pri(self.addargs.upper())
 
     def cmd_default(self):
         print self.parser.print_help()
@@ -85,6 +90,7 @@ class TDCli(object):
             'addc':     self.cmd_add,
             'addd':     self.cmd_add,
             'add':      self.cmd_add,
+            'lspri':      self.cmd_lspri,
             'del':      self.cmd_rm,
             'rm':       self.cmd_rm,
             'do':       self.cmd_do,
