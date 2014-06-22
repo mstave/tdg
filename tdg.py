@@ -11,6 +11,7 @@ import ttk
 import todo_file
 from todo_item import TodoItem
 import os
+import platform
 
 
 class TDTk(object):
@@ -27,7 +28,7 @@ class TDTk(object):
         self.status_bar = None
         self.help_bar = None
         self.tabs = None
-
+        
         #mapping of which tab (frame) maps to which todo_file
         self.tab_file = {}
 
@@ -149,15 +150,19 @@ class TDTk(object):
         low_pri_pane = tk.PanedWindow(lbox_panes, orient=tk.HORIZONTAL)
         low_pri_pane.pack(fill=tk.BOTH, expand=1)
         lbox_panes.add(low_pri_pane)
-
+        
         pri_lists = {}
-        # Pri A listbox
-        aLabelFont = tkFont.Font(size="16", family="Helvetica" )
+
+        default_font = tkFont.nametofont("TkDefaultFont")
+        default_family = default_font['family']
+        aLabelFont = tkFont.Font(size="16", family=default_family )
+
         pri_lists["A"] = tk.LabelFrame(
             high_pri_pane, text=self.pri_map["A"], font=aLabelFont)
         pri_lists["A"].pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.add_listbox(
-            pri_lists["A"], "A", tkFont.Font(size="13",family="Helvetica", weight="bold"), include_func, td_file)
+            pri_lists["A"], "A", tkFont.Font(size="13", family=default_family,
+                                             weight="bold"), include_func, td_file)
         high_pri_pane.add(pri_lists["A"], stretch="always")
 
         # Pri <None> listbox
@@ -165,7 +170,7 @@ class TDTk(object):
             high_pri_pane, text=self.pri_map["B"], font=aLabelFont)
         pri_lists["B"].pack(fill=tk.BOTH, expand=1)
         self.add_listbox(
-            pri_lists["B"], "B", tkFont.Font(size="12",family="Helvetica"), include_func, td_file)
+            pri_lists["B"], "B", tkFont.Font(size="12",family=default_family), include_func, td_file)
         high_pri_pane.add(pri_lists["B"], stretch="always")
         for pri in ["C", "D", None]:
         # for pri in self.active_td_file().get_priorities():
@@ -173,7 +178,8 @@ class TDTk(object):
                                            text=self.pri_map[pri])
             pri_lists[pri].pack(fill=tk.BOTH, expand=1)
             self.add_listbox(
-                pri_lists[pri], pri, tkFont.Font(size="10", family="Helvetica"), include_func, td_file)
+                pri_lists[pri], pri, tkFont.Font(size="10", family=default_family), 
+                include_func, td_file)
             low_pri_pane.add(pri_lists[pri], stretch="always")
 
     def add_listbox(self, parent, priority, thefont, include_func, td_file):
