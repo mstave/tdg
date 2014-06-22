@@ -15,7 +15,8 @@ class TDCli(object):
     '''
     classdocs
     '''
-    tdFilename = "todo.txt"
+    #tdFilename = "customtodo.txt"
+    tdFilename = None  # todo_file has good defaults
     td_file = None
     cmd = None
     addargs = None

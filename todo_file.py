@@ -59,7 +59,10 @@ class TodoFile(object):
             if not os.path.exists(self.todo_file_name):
                 self.todo_file_name = os.path.join(os.getcwd(), f_name)
             if not os.path.exists(self.todo_file_name):
+                self.todo_file_name = os.path.join(os.path.dirname(__file__), f_name)
+            if not os.path.exists(self.todo_file_name):
                 sys.exit("Error: " + f_name + " not found in $" + self.ENV_TD_DIR + ", "
+                    + os.path.dirname(__file__) + ", "
                     + os.path.expanduser("~") + " or "
                     + os.getcwd())
 
