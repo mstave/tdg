@@ -1,4 +1,3 @@
-
             body {
                 font-family:  Arial, Verdana, sans-serif;
             }
@@ -22,7 +21,7 @@
                 margin-top: 3px;
                 padding-bottom: 0px;
                 padding-top: 0px;
-                text-align:  center;
+                text-align:  left;
                 }
             th {
                 font-size: large;
@@ -31,6 +30,13 @@
 		/* background: #669999; */
 		color: white;
             }
+	    td:nth-child(3) {   /* 3rd column in the table: priority */
+		text-align:center;
+	    }
+	    td:nth-child(4) {   /* 4th column in the table: todo text */
+		text-align:left;
+		padding: 5px;
+	    }
             tr {
                 /*background-image: -moz-linear-gradient(50% 0%, #FFF, #F4F4F4);*/
 		background: #F0F5F5;

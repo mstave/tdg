@@ -8,6 +8,8 @@ todo_app = flask.Flask(__name__)
 @todo_app.before_request
 def before_request():
     g.tdfile = todo_file.TodoFile()
+    g.tdfile.todo_txt_arr.sort()
+    g.tdfile.update_todo_item_arr()
     g.dirty = False
     
 @todo_app.after_request
