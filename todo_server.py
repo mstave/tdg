@@ -17,7 +17,7 @@ def after_request(response):
     if g.dirty == True:
         g.tdfile.todo_txt_arr.sort()
         g.tdfile.update_todo_item_arr()
-        g.tdfile.write_file();
+        g.tdfile.write_file()
     return response
 
 
@@ -25,7 +25,7 @@ def after_request(response):
 def serialize(obj):
     if isinstance(obj, int):
         return obj
-    if isinstance(obj, (bool, int, long, float, basestring)):
+    if isinstance(obj, (bool, int, float)):
         return obj
     elif isinstance(obj, dict):
         obj = obj.copy()
@@ -44,8 +44,8 @@ def serialize(obj):
 
 @todo_app.route("/del/<int:td_id>", methods=['GET','POST'])
 def delete_td(td_id):
-    g.tdfile.delete_task(td_id);
-    g.dirty = True;
+    g.tdfile.delete_task(td_id)
+    g.dirty = True
     return flask.redirect("/")
 
 
@@ -61,7 +61,7 @@ def add_new():
     newTD.project = request.form.get('project')
     newTD.create_today()
     g.tdfile.append(newTD)
-    g.dirty = True;
+    g.dirty = True
 
     return flask.redirect("/")
 
@@ -71,12 +71,12 @@ def add_new():
 def receives_json():
     try:
         thejson = request.json
-        print "postass"
+        print ("postass")
     # print('---------- got it ------ ')
-        print "trying...."
+        print ("trying....")
         print("request json was " + str(request.json))
     except:
-        print "error parsing " + str(request.__dict__)
+        print ("error parsing " + str(request.__dict__))
 
     newTD = todo_item.TodoItem()
     newTD.parse_json(request.json)

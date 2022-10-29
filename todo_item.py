@@ -22,7 +22,7 @@ class TodoItem(object):  # pylint: disable-msg=R0902
         self.context = None
         self.gui_index = None
         self.done = None
-        #self.todo_txt_line = raw_text
+        # self.todo_txt_line = raw_text
         if raw_text is not None:
             self.parse_done(raw_text)
             self.parse_creation_date(raw_text)
@@ -120,11 +120,11 @@ class TodoItem(object):  # pylint: disable-msg=R0902
                 pass
                 # may want to investigate supporting this
                 # but the file format seems to forid it
-                #if raw_text[24] == "(" and raw_text[26] == ")":
+                # if raw_text[24] == "(" and raw_text[26] == ")":
                 #    self.priority = raw_text[25]
 
     def parse_creation_date(self, raw_text):
-        date_pattern = re.compile(r'(\d{4}\-\d{2}\-\d{2}).*')
+        date_pattern = re.compile(r'(\d{4}-\d{2}-\d{2}).*')
         temp_line = raw_text
         self.creation_date = None
         if self.done:
@@ -169,8 +169,7 @@ class TodoItem(object):  # pylint: disable-msg=R0902
         self.done = json_data.get('_done', None)
         self.project = json_data.get('project', None)
 
-
-    def create_today(self): 
+    def create_today(self):
         self.creation_date = self.curr_date_str()
 
     @classmethod

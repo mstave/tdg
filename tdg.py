@@ -1,34 +1,49 @@
 #!/usr/bin/env python
-'''
+"""
 Created on Oct 7, 2012
 
 @author: Matt Stave
-'''
+"""
 
-import Tkinter as tk
-import tkFont
-import ttk
+import tkinter as tk
+import tkinter.font as tkFont
+import tkinter.ttk as ttk
 import todo_file
 from todo_item import TodoItem
 import os
 
 
+def add_attr(win, display_str, store_var, g_row):
+    tk.Label(win, text=display_str).grid(row=g_row, column=1)
+    ent = tk.Entry(win, width=80, textvariable=store_var)
+    ent.grid(row=g_row, column=2, columnspan=2)
+    return ent
+
+
+def include_all(arg):
+    return True
+
+
+def excludeDone(arg):
+    return not arg.done
+
+
 class TDTk(object):
-    '''
+    """
    GUI for TodoFile
-    '''
+    """
 
     def __init__(self):
-        '''
+        """
         Constructor
-        '''
+        """
         self.root = tk.Tk()
-        self.status_strvar = ttk.Tkinter.StringVar()
+        self.status_strvar = tk.StringVar()
         self.status_bar = None
         self.help_bar = None
         self.tabs = None
-        
-        #mapping of which tab (frame) maps to which todo_file
+
+        # mapping of which tab (frame) maps to which todo_file
         self.tab_file = {}
 
         # window for inserting new tasks
@@ -56,13 +71,13 @@ class TDTk(object):
     def load(self):
         self.td_file = None
         self.td_file1 = todo_file.TodoFile()
-	win_dbox = "c:\\dropbox\\todo\\todo.txt"
-	other_dbox = os.path.join(os.getenv("HOME"), "Dropbox/todo/todo.txt")
-	if os.path.isfile(win_dbox):
-       	    self.td_file2 = todo_file.TodoFile(win_dbox)
-	elif os.path.isfile(other_dbox):
+        win_dbox = "c:\\dropbox\\todo\\todo.txt"
+        other_dbox = os.path.join(os.getenv("HOME", ""), "Dropbox/todo/todo.txt")
+        if os.path.isfile(win_dbox):
+            self.td_file2 = todo_file.TodoFile(win_dbox)
+        elif os.path.isfile(other_dbox):
             self.td_file2 = todo_file.TodoFile(other_dbox)
-	else:
+        else:
             self.td_file2 = None
         self.td_file3 = todo_file.TodoFile(os.path.join(os.path.dirname(__file__), "todo.txt"))
 
@@ -92,23 +107,17 @@ class TDTk(object):
             "Adding new item: " + str(new_item) + " ... save complete")
         self.reset_ui()
 
-    def add_attr(self, win, display_str, store_var, g_row):
-        tk.Label(win, text=display_str).grid(row=g_row, column=1)
-        ent = tk.Entry(win, width=80, textvariable=store_var)
-        ent.grid(row=g_row, column=2, columnspan=2)
-        return ent
-
     def add_task(self, event):
         self.add_win = tk.Toplevel(takefocus=True)
         self.add_win.title = "Add a new to do"
-        self.add_attr(self.add_win, "Task: ", self.new_task, 1).focus()
-        self.add_attr(self.add_win, "Pri: ", self.new_priority, 2)
-        self.add_attr(self.add_win, "Context: ", self.new_context, 3)
-        self.add_attr(self.add_win, "Creation Date: ", self.new_date, 4)
+        add_attr(self.add_win, "Task: ", self.new_task, 1).focus()
+        add_attr(self.add_win, "Pri: ", self.new_priority, 2)
+        add_attr(self.add_win, "Context: ", self.new_context, 3)
+        add_attr(self.add_win, "Creation Date: ", self.new_date, 4)
         button_frame = tk.Frame(self.add_win)
         button_frame.grid(row=5, columnspan=2, column=2)
         tk.Button(button_frame, text="Close", command=lambda:
-                  self.add_win.destroy()).pack(side=tk.LEFT)
+        self.add_win.destroy()).pack(side=tk.LEFT)
         tk.Button(button_frame, text="Add this task",
                   command=lambda: self.save()).pack(side=tk.LEFT)
         tk.Button(button_frame, text="Add and close",
@@ -123,19 +132,14 @@ class TDTk(object):
         self.add_win.destroy()
 
     # methods for determining which items to display
-    def includeAll(self, arg):
-        return True
-
-    def excludeDone(self, arg):
-        return not arg.done
 
     def list_ui(self, td_file, root_frame=None, include_func=None):
-        '''
+        """
         add lists for each priority to root_frame
         include_func is called on each item to determine if it should be shown
-        '''
+        """
         if include_func is None:
-            include_func = self.includeAll
+            include_func = include_all
         if root_frame is None:
             root_frame = self.frame
         # add panes
@@ -149,18 +153,18 @@ class TDTk(object):
         low_pri_pane = tk.PanedWindow(lbox_panes, orient=tk.HORIZONTAL)
         low_pri_pane.pack(fill=tk.BOTH, expand=1)
         lbox_panes.add(low_pri_pane)
-        
+
         pri_lists = {}
 
         default_font = tkFont.nametofont("TkDefaultFont")
         default_family = default_font['family']
-        aLabelFont = tkFont.Font(size="16", family=default_family )
+        aLabelFont = tkFont.Font(size=16, family=default_family)
 
         pri_lists["A"] = tk.LabelFrame(
             high_pri_pane, text=self.pri_map["A"], font=aLabelFont)
         pri_lists["A"].pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.add_listbox(
-            pri_lists["A"], "A", tkFont.Font(size="13", family=default_family,
+            pri_lists["A"], "A", tkFont.Font(size=13, family=default_family,
                                              weight="bold"), include_func, td_file)
         high_pri_pane.add(pri_lists["A"], stretch="always")
 
@@ -169,15 +173,15 @@ class TDTk(object):
             high_pri_pane, text=self.pri_map["B"], font=aLabelFont)
         pri_lists["B"].pack(fill=tk.BOTH, expand=1)
         self.add_listbox(
-            pri_lists["B"], "B", tkFont.Font(size="12",family=default_family), include_func, td_file)
+            pri_lists["B"], "B", tkFont.Font(size=12, family=default_family), include_func, td_file)
         high_pri_pane.add(pri_lists["B"], stretch="always")
         for pri in ["C", "D", None]:
-        # for pri in self.active_td_file().get_priorities():
+            # for pri in self.active_td_file().get_priorities():
             pri_lists[pri] = tk.LabelFrame(low_pri_pane,
                                            text=self.pri_map[pri])
             pri_lists[pri].pack(fill=tk.BOTH, expand=1)
             self.add_listbox(
-                pri_lists[pri], pri, tkFont.Font(size="10", family=default_family), 
+                pri_lists[pri], pri, tkFont.Font(size=10, family=default_family),
                 include_func, td_file)
             low_pri_pane.add(pri_lists[pri], stretch="always")
 
@@ -201,8 +205,9 @@ class TDTk(object):
 
         return lbox
 
-    def colorize(self, listb_row):
-        #if listb_row.context and "Ops" in listb_row.context:
+    @staticmethod
+    def colorize(listb_row):
+        # if listb_row.context and "Ops" in listb_row.context:
         if listb_row.context:
             return {"fg": "navy"}
         if listb_row.project:
@@ -229,7 +234,8 @@ class TDTk(object):
     def list_selected(self, event):
         # ignore clicks on empty listboxes
         if event.widget.curselection() != ():
-            self.set_status(self.active_td_file().todo_item_arr[self.active_td_file().todo_txt_arr.index(event.widget.get(event.widget.curselection()[0]))])
+            self.set_status(self.active_td_file().todo_item_arr[self.active_td_file().todo_txt_arr.index(
+                event.widget.get(event.widget.curselection()[0]))])
 
     def set_priority(self, event):
         pri = event.char
@@ -291,10 +297,11 @@ class TDTk(object):
         self.td_file1.write_file()
         self.td_file3.write_file()
         if self.td_file is not None:
-	    self.td_file2.write_file()
+            self.td_file2.write_file()
             self.set_status(self.td_file3.todo_file_name + " and " + self.td_file1.todo_file_name + " have been saved")
         else:
-            self.set_status(self.td_file3.todo_file_name + " and " + self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
+            self.set_status(
+                self.td_file3.todo_file_name + " and " + self.td_file1.todo_file_name + " and " + self.td_file2.todo_file_name + " have been saved")
 
     def debug2(self, event):
         self.set_status("Tab info: " + str(self.tabs.select()) + " " + str(self.tabs.index(self.tabs.select())))
@@ -334,7 +341,7 @@ class TDTk(object):
     def add_tab(self, root, func, label_text, td_file):
         new_frame = ttk.Frame(root)
         self.tab_file[str(new_frame)] = td_file
-        self.list_ui(td_file,new_frame, func)
+        self.list_ui(td_file, new_frame, func)
         new_frame.pack(fill=tk.BOTH, expand=1)
         root.add(new_frame, text=label_text)
         return new_frame
@@ -349,13 +356,13 @@ class TDTk(object):
         self.add_tab(self.tabs, lambda arg: (
             True), "Github tdg", self.td_file3)
         self.add_tab(self.tabs, lambda arg: (
-            arg.done ), "Complete: Work", self.td_file1)
+            arg.done), "Complete: Work", self.td_file1)
         self.add_tab(
-            #self.tabs, lambda arg: arg.context != "home", "All: Work")
+            # self.tabs, lambda arg: arg.context != "home", "All: Work")
             self.tabs, lambda arg: True, "All: Work", self.td_file1)
         if self.td_file is not None:
             self.add_tab(self.tabs, lambda arg: (
-                         arg.done ), "Complete: Dropbox", self.td_file2)
+                arg.done), "Complete: Dropbox", self.td_file2)
             self.add_tab(
                 self.tabs, lambda arg: True, "All: Dropbox", self.td_file2)
         self.tabs.pack(fill=tk.BOTH, expand=1)
@@ -372,12 +379,12 @@ class TDTk(object):
         self.help_bar = tk.Label(self.frame, text=self.command_help())
         self.help_bar.pack(side=tk.BOTTOM, fill=tk.X)
         if self.status_bar is None:
-            self.status_bar = tk.Label(self.frame, anchor=tk.W, justify="left",
-                                       textvar=self.status_strvar)
+            self.status_bar = tk.Label(self.frame, anchor=tk.W, justify="left", textvariable=self.status_strvar)
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
         self.frame.master.title("To do GUI")
         self.restore_active_tab()
         self.root.mainloop()
+
 
 if __name__ == "__main__":
     app = TDTk()

@@ -38,7 +38,6 @@ class TodoFile(object):
         self.be_quiet = be_quiet
         self.set_filename(f_name)
         self.load_file(self.todo_file_name)
-        
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
@@ -62,9 +61,9 @@ class TodoFile(object):
                 self.todo_file_name = os.path.join(os.path.dirname(__file__), f_name)
             if not os.path.exists(self.todo_file_name):
                 sys.exit("Error: " + f_name + " not found in $" + self.ENV_TD_DIR + ", "
-                    + os.path.dirname(__file__) + ", "
-                    + os.path.expanduser("~") + " or "
-                    + os.getcwd())
+                         + os.path.dirname(__file__) + ", "
+                         + os.path.expanduser("~") + " or "
+                         + os.getcwd())
 
     def get_gui_index(self, query):
         index = 0
@@ -76,7 +75,7 @@ class TodoFile(object):
     def get_priorities(self):
         pris = []
         for item in self.todo_item_arr:
-            if not item.priority in pris:
+            if item.priority not in pris:
                 pris.append(item.priority)
         pris.sort()
         return pris
@@ -108,14 +107,14 @@ class TodoFile(object):
             precmd = os.path.expanduser(os.environ["TD_PRELOAD"])
             self.last_msg = subprocess.check_output(precmd, shell=True)
             if not self.be_quiet:
-                print self.last_msg
+                print(self.last_msg)
         except KeyError:
             pass
         if f_name is not None:
             self.todo_file_name = f_name
         t_file = open(self.todo_file_name, "r")
         getlines = t_file.readlines()
-        #getlines = open(self.todo_file_name).readlines()
+        # getlines = open(self.todo_file_name).readlines()
         self.todo_txt_arr = [line.strip() for line in getlines]
         self.update_todo_item_arr()
 
@@ -129,7 +128,7 @@ class TodoFile(object):
         try:
             postcmd = os.environ["TD_POSTSAVE"]
             self.last_msg = subprocess.check_output(postcmd, shell=True)
-            print self.last_msg
+            print(self.last_msg)
         except KeyError:
             pass
 
@@ -155,7 +154,7 @@ class TodoFile(object):
 
     def ls_grep(self, rex):
 
-        #temp_arr = self.todo_txt_arr
+        # temp_arr = self.todo_txt_arr
         temp_arr = []
         for todo in self.todo_txt_arr:
             if re.search(rex, todo):
@@ -165,6 +164,6 @@ class TodoFile(object):
     def ls_pri(self, pri):
         temp_arr = []
         for todo in self.todo_item_arr:
-            if (todo.priority == pri):
+            if todo.priority == pri:
                 temp_arr.append(str(todo))
         return '\n'.join(temp_arr) + "\n"
